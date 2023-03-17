@@ -1,0 +1,61 @@
+Colour,Player Types, Num Nodes, Avg Capture Time (Num Rounds), Avg Run Time (s), P Win / T Win
+0,Random Probe Random Target,500,167.2,0.104835176467895,10/0
+0,Random Probe Random Target,150,27.7,0.00530283451080322,10/0
+0,Random Probe Random Target,50,16.9,0.00123710632324219,10/0
+0,Random Probe Random Target,350,122.222222222222,0.0598364353179932,9/1
+0,Random Probe Random Target,450,166.111111111111,0.103846549987793,9/1
+0,Random Probe Random Target,300,114.5,0.0563465595245361,8/2
+0,Random Probe Random Target,100,28,0.00420942306518555,9/1
+0,Random Probe Random Target,200,52.3333333333333,0.0158712863922119,9/1
+0,Random Probe Random Target,400,182.9,0.0854955196380615,10/0
+0,Random Probe Random Target,250,85.1,0.0275968313217163,10/0
+1,Random Probe UpTree Target,500,195.111111111111,0.149493861198425,9/1
+1,Random Probe UpTree Target,150,23.5,0.015145754814148,6/4
+1,Random Probe UpTree Target,50,19.5,0.00140318870544434,10/0
+1,Random Probe UpTree Target,350,155.428571428571,0.083972692489624,7/3
+1,Random Probe UpTree Target,450,200.8,0.108373975753784,10/0
+1,Random Probe UpTree Target,300,52.7777777777778,0.0288972854614258,9/1
+1,Random Probe UpTree Target,100,9.5,0.00119807720184326,10/0
+1,Random Probe UpTree Target,200,86.1,0.0223008632659912,10/0
+1,Random Probe UpTree Target,400,115.714285714286,0.096835207939148,7/3
+1,Random Probe UpTree Target,250,29.7,0.0100743293762207,10/0
+2,Random Probe downTree Target,500,144.5,0.0840187788009644,10/0
+2,Random Probe downTree Target,150,53.75,0.01277916431427,8/2
+2,Random Probe downTree Target,50,17,0.0011040210723877,10/0
+2,Random Probe downTree Target,350,127.333333333333,0.0599860429763794,9/1
+2,Random Probe downTree Target,450,64.2222222222222,0.0552441596984863,9/1
+2,Random Probe downTree Target,300,94,0.0509762048721314,8/2
+2,Random Probe downTree Target,100,46.125,0.00759589672088623,8/2
+2,Random Probe downTree Target,200,126.285714285714,0.0355512857437134,7/3
+2,Random Probe downTree Target,400,139,0.0670137882232666,10/0
+2,Random Probe downTree Target,250,37.3,0.0111849784851074,10/0
+3,Random Leaf Probe Random Target,500,164.5,0.0948060989379883,10/0
+3,Random Leaf Probe Random Target,150,50.2,0.0092665433883667,10/0
+3,Random Leaf Probe Random Target,50,5.4,0.000354671478271484,10/0
+3,Random Leaf Probe Random Target,350,77.1111111111111,0.0409936904907227,9/1
+3,Random Leaf Probe Random Target,450,109.5,0.0570818901062012,10/0
+3,Random Leaf Probe Random Target,300,83.3,0.0294634580612183,10/0
+3,Random Leaf Probe Random Target,100,24,0.0028012752532959,10/0
+3,Random Leaf Probe Random Target,200,38.4444444444444,0.012370491027832,9/1
+3,Random Leaf Probe Random Target,400,66.7777777777778,0.0471435070037842,9/1
+3,Random Leaf Probe Random Target,250,22.9,0.0068406343460083,10/0
+4,Random Leaf Probe UpTree Target,500,79.1,0.0464498996734619,10/0
+4,Random Leaf Probe UpTree Target,150,32.7,0.0057826042175293,10/0
+4,Random Leaf Probe UpTree Target,50,8.75,0.00107879638671875,8/2
+4,Random Leaf Probe UpTree Target,350,116.2,0.0454610109329224,10/0
+4,Random Leaf Probe UpTree Target,450,131.5,0.0699683904647827,10/0
+4,Random Leaf Probe UpTree Target,300,77.1,0.0281611919403076,10/0
+4,Random Leaf Probe UpTree Target,100,12,0.00149509906768799,10/0
+4,Random Leaf Probe UpTree Target,200,78.9,0.0182762861251831,10/0
+4,Random Leaf Probe UpTree Target,400,194.8,0.141853642463684,5/5
+4,Random Leaf Probe UpTree Target,250,32.9,0.0105028867721558,10/0
+5,Random Leaf Probe downTree Target,500,123.444444444444,0.0954608201980591,9/1
+5,Random Leaf Probe downTree Target,150,36.5,0.00655553340911865,10/0
+5,Random Leaf Probe downTree Target,50,8.6,0.000565719604492188,10/0
+5,Random Leaf Probe downTree Target,350,93.9,0.0389993906021118,10/0
+5,Random Leaf Probe downTree Target,450,132,0.092076849937439,9/1
+5,Random Leaf Probe downTree Target,300,69.5555555555556,0.0356927633285522,9/1
+5,Random Leaf Probe downTree Target,100,27,0.00323092937469482,10/0
+5,Random Leaf Probe downTree Target,200,66.6,0.0155489683151245,10/0
+5,Random Leaf Probe downTree Target,400,93.4444444444445,0.0578656911849976,9/1
+5,Random Leaf Probe downTree Target,250,66.7777777777778,0.0261491775512695,9/1
