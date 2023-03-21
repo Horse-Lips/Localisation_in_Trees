@@ -1,0 +1,64 @@
+ ====== Run 1 ====== 
+Start location: 10
+Time taken: 0.0004999637603759766
+Capture time: 4
+Winner: Probe
+
+ ====== Run 2 ====== 
+Start location: 20
+Time taken: 0.011088132858276367
+Capture time: 103
+Winner: Target
+
+ ====== Run 3 ====== 
+Start location: 30
+Time taken: 0.0015082359313964844
+Capture time: 16
+Winner: Probe
+
+ ====== Run 4 ====== 
+Start location: 40
+Time taken: 0.011013984680175781
+Capture time: 103
+Winner: Target
+
+ ====== Run 5 ====== 
+Start location: 50
+Time taken: 0.010535478591918945
+Capture time: 103
+Winner: Target
+
+ ====== Run 6 ====== 
+Start location: 60
+Time taken: 0.012073516845703125
+Capture time: 103
+Winner: Target
+
+ ====== Run 7 ====== 
+Start location: 70
+Time taken: 0.00699925422668457
+Capture time: 62
+Winner: Probe
+
+ ====== Run 8 ====== 
+Start location: 80
+Time taken: 0.011031866073608398
+Capture time: 103
+Winner: Target
+
+ ====== Run 9 ====== 
+Start location: 90
+Time taken: 0.012144804000854492
+Capture time: 103
+Winner: Target
+
+ ====== Run 10 ====== 
+Start location: 100
+Time taken: 0.0015079975128173828
+Capture time: 18
+Winner: Probe
+
+ ====== Averages and Win Rates ====== 
+Overall avg capt time: 71.8
+Probe win avg capt time: 25.0
+Wins: T = 6 | P = 4

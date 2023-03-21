@@ -1,15 +1,12 @@
-from heuristicMovement   import targetMovement
-from localisation        import Localisation
-from localisation.probe  import Probe
-from localisation.target import Target
+from heuristicMovement import *
+from heuristicClass    import *
 import networkx as nx
 import os, re, time
 
 
-#tree = nx.read_adjlist("randomTrees/randomTree500.txt")
-tree = nx.read_adjlist("randomTrees/seagTree101.txt")
-print(tree)
-resFile = open("tLeftProbeProbTarget.txt", 'w')
+#tree = nx.read_adjlist("treeFiles/randomTree50.txt")
+tree = nx.read_adjlist("treeFiles/seagTree101.txt")
+resFile = open("tRightProbeProbTarget.txt", 'w')
 
 tWinCount = 0
 pWinCount = 0
@@ -19,9 +16,14 @@ avgCaptTime     = 0
 
 for i in range(1, 11):
     resFile.write(" ====== Run " + str(i) + " ====== \n")
-    pPlayer = Probe("tLeft")
-    tPlayer = Target(None, targetMovement.prob)
-    game = Localisation(tree, tPlayer, pPlayer)
+    
+    pPlayer = Probe("tRight")                #Create probe player with move function
+    tPlayer = Target(None, tProbabilistic)  #Create target player with move function
+    
+    tInitialMove = str(((len(tree) - 1) // 10) * i)    #Use every n/10th node rounded down as start position
+    tPlayer.moveList.append(tInitialMove)
+    
+    game = Localisation(tree, tPlayer, pPlayer, tInitial = tInitialMove)
 
     startTime = time.time()
     game.play()

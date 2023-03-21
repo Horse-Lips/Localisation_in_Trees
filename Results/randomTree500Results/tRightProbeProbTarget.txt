@@ -1,64 +1,64 @@
  ====== Run 1 ====== 
-Start location: 383
-Time taken: 0.028549909591674805
-Capture time: 48
+Start location: 49
+Time taken: 0.13601279258728027
+Capture time: 244
 Winner: Probe
 
  ====== Run 2 ====== 
-Start location: 71
-Time taken: 0.05811333656311035
-Capture time: 108
-Winner: Probe
-
- ====== Run 3 ====== 
-Start location: 466
-Time taken: 0.3061490058898926
+Start location: 98
+Time taken: 0.2926981449127197
 Capture time: 501
 Winner: Target
 
- ====== Run 4 ====== 
-Start location: 194
-Time taken: 0.07468032836914062
-Capture time: 134
+ ====== Run 3 ====== 
+Start location: 147
+Time taken: 0.012032270431518555
+Capture time: 24
 Winner: Probe
 
+ ====== Run 4 ====== 
+Start location: 196
+Time taken: 0.3091604709625244
+Capture time: 501
+Winner: Target
+
  ====== Run 5 ====== 
-Start location: 478
-Time taken: 0.019547700881958008
-Capture time: 32
+Start location: 245
+Time taken: 0.12679362297058105
+Capture time: 236
 Winner: Probe
 
  ====== Run 6 ====== 
-Start location: 42
-Time taken: 0.1625525951385498
-Capture time: 264
+Start location: 294
+Time taken: 0.05226445198059082
+Capture time: 88
 Winner: Probe
 
  ====== Run 7 ====== 
-Start location: 253
-Time taken: 0.005006551742553711
-Capture time: 10
+Start location: 343
+Time taken: 0.2085409164428711
+Capture time: 392
 Winner: Probe
 
  ====== Run 8 ====== 
-Start location: 394
-Time taken: 0.0770864486694336
-Capture time: 124
+Start location: 392
+Time taken: 0.0020110607147216797
+Capture time: 4
 Winner: Probe
 
  ====== Run 9 ====== 
-Start location: 24
-Time taken: 0.04755139350891113
-Capture time: 84
+Start location: 441
+Time taken: 0.0010004043579101562
+Capture time: 2
 Winner: Probe
 
  ====== Run 10 ====== 
-Start location: 363
-Time taken: 0.08866381645202637
-Capture time: 142
+Start location: 490
+Time taken: 0.025101900100708008
+Capture time: 44
 Winner: Probe
 
  ====== Averages and Win Rates ====== 
-Overall avg capt time: 144.7
-Probe win avg capt time: 105.11111111111111
-Wins: T = 1 | P = 9
+Overall avg capt time: 203.6
+Probe win avg capt time: 129.25
+Wins: T = 2 | P = 8

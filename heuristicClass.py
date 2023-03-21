@@ -1,5 +1,5 @@
 import networkx as nx
-
+from random import choice
 
 class nodeInfo:
     """
@@ -24,14 +24,17 @@ class Localisation:
         - probe    - Probe object
         - win      - "p" if probe wins, "t" if target wins, otherwise None
         - captTime - Rounds taken to locate target
+        - tInitial - Target start location (optional)
     """
-    def __init__(self, tree, target, probe):
+    def __init__(self, tree, target, probe, tInitial = None):
         self.tree     = tree
         self.target   = target
         self.probe    = probe
         self.win      = None
         self.captTime = 1       #Start at 1 for initial moves
 
+        self.tInitial = tInitial
+        
         self.tDict = dict()
         self.lDict = dict()
 
@@ -51,7 +54,8 @@ class Localisation:
          - Calls the target's initial() function for initial placement, then alternates
          - the play() function for probe and target until there is a winner.
         """
-        tMove = self.target.initial(self.tree)      #Initial target placement
+        if self.tInitial is None: tMove = self.target.initial(self.tree)      #Initial target placement
+        else:                     tMove = self.tInitial
         pMove = self.probe.initial()                #Initial probe move (Usually root)
         
         while True:
@@ -115,8 +119,8 @@ class Probe:
 
 
     def move(self, tree, tDict, lDict, d):
-        if type(self.moveFunc) == str: self.simpleSeager(tree, tDict, lDict, d)
-        else:                          self.moveFunc(tree, tDict, lDict, self.moveList, d)
+        if type(self.moveFunc) == str: return self.simpleSeager(tree, tDict, lDict, d)
+        else:                          return self.moveFunc(tree, tDict, lDict, self.moveList, d)
 
 
     def simpleSeager(self, tree, tDict, lDict, d):
@@ -128,25 +132,11 @@ class Probe:
             elif self.dk      != []: parentSet = self.dk
             elif self.dkMinus != []: parentSet = self.dkMinus
             
-            if parentSet == []:
-                self.moveList.append("0")
-                return self.moveList[-1]
-                
-            elif self.moveFunc == "tLeft":
-                self.moveList.append(tDict[parentSet[0]].parent)
-                return self.moveList[-1]
-                
-            elif self.moveFunc == "tRight":
-                self.moveList.append(tDict[parentSet[-1]].parent)
-                return self.moveList[-1]
-                
-            elif self.moveFunc == "bLeft":
-                self.moveList.append(tDict[parentSet[0]].children[0])
-                return self.moveList[-1]
-                
-            elif self.moveFunc == "bRight":
-                self.moveList.append(tDict[parentSet[0]].children[-1])
-                return self.moveList[-1]
+            if parentSet == []:             self.moveList.append("0")
+            elif self.moveFunc == "tLeft":  self.moveList.append(tDict[parentSet[0]].parent)
+            elif self.moveFunc == "tRight": self.moveList.append(tDict[parentSet[-1]].parent)
+            elif self.moveFunc == "bLeft":  self.moveList.append(tDict[parentSet[0]].children[0])
+            elif self.moveFunc == "bRight": self.moveList.append(tDict[parentSet[0]].children[-1])
             
         elif len(self.moveList) % 1 == 0:
             try:    self.dkMinus = lDict[d - 1]
@@ -157,26 +147,15 @@ class Probe:
             try:    self.dkPlus = lDict[d + 1]
             except: self.dkPlus = lDict[d]
 
-            if self.moveFunc == "tLeft":
-                self.moveList.append(self.dkMinus[0])
-                return self.moveList[-1]
-                
-            elif self.moveFunc == "tRight":
-                self.moveList.append(self.dkMinus[-1])
-                return self.moveList[-1]
-                
-            elif self.moveFunc == "bLeft":
-                self.moveList.append(self.dkPlus[0])
-                return self.moveList[-1]
-                
-            elif self.moveFunc == "bRight":
-                self.moveList.append(self.dkPlus[-1])
-                return self.moveList[-1]
+            if self.moveFunc == "tLeft":    self.moveList.append(self.dkMinus[0])
+            elif self.moveFunc == "tRight": self.moveList.append(self.dkMinus[-1])
+            elif self.moveFunc == "bLeft":  self.moveList.append(self.dkPlus[0])
+            elif self.moveFunc == "bRight": self.moveList.append(self.dkPlus[-1])
         
         else:
             self.moveList.append("0")
-            return self.moveList[-1]
-
+    
+        return self.moveList[-1]
 
     def initial(self):
         self.moveList.append("0")
