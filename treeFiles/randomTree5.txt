@@ -1,0 +1,8 @@
+#.\graphGenerator.py 5
+# GMT Thu Apr 13 12:02:15 2023
+# 
+0 2
+1 4
+2 3 4
+3
+4

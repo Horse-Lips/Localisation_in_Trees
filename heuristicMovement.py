@@ -20,7 +20,7 @@ def tUpTree(tree, tDict, lDict, node):
     """
     n = uniform(0, 1)
 
-    if n <= 0.7 and tDict[node].parent is not None:   return tDict[node].parent
+    if   n <= 0.7 and tDict[node].parent is not None: return tDict[node].parent
     elif n <= 0.9 and tDict[node].children != []:     return choice(tDict[node].children)
     else:                                             return node
 
@@ -32,7 +32,7 @@ def tDownTree(tree, tDict, lDict, node):
     """
     n = uniform(0, 1)
 
-    if n <= 0.7 and tDict[node].children != []:       return choice(tDict[node].children)
+    if   n <= 0.7 and tDict[node].children != []:     return choice(tDict[node].children)
     elif n <= 0.9 and tDict[node].parent is not None: return tDict[node].parent
     else:                                             return node
 
@@ -46,9 +46,9 @@ def tUpDown(tree, tDict, lDict, node):
     """
     n = uniform(0, 1)
     
-    if n <= 0.35  and tDict[node].parent is not None: return tDict[node].parent
-    elif n <= .85 and tDict[node].children != []:     return choice(tDict[node].children)
-    else:                                             return node
+    if   n <= 0.35  and tDict[node].parent is not None: return tDict[node].parent
+    elif n <= .85 and tDict[node].children != []:       return choice(tDict[node].children)
+    else:                                               return node
 
 
 def tProbabilistic(tree, tDict, lDict, node):

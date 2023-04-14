@@ -78,6 +78,8 @@ class Localisation:
             tMove = self.target.move(self.tree, self.tDict, self.lDict)
             pMove = self.probe.move(self.tree, self.tDict, self.lDict, tDist)
             self.captTime += 1
+        
+        return self.captTime
 
 
     def createTDict(self, node, parent = None, level = 0):
