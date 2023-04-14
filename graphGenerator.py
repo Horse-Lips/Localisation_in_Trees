@@ -1,3 +1,8 @@
+"""
+ - Simple script used for generating hide-out free.
+ - trees Given a number n as command line argument
+ - will generate a hideout-free tree with n nodes.
+"""
 import sys
 import networkx as nx
 
@@ -17,6 +22,12 @@ class nodeInfo:
 
 
 def detectHideouts(tDict):
+    """
+     - Detects hideouts in a tree defined as a node with at least
+     - 3 neighbours each of which have at least 3 neighbours.
+     - Variables:
+        - tDict - tDict representation of the tree (See genTreeDicts)
+    """
     for node in tDict:        
         children = tDict[node].children     #Get node's children
         parent   = tDict[node].parent       #Get node's parent
@@ -36,25 +47,20 @@ def detectHideouts(tDict):
 
 
 def genTreeDicts(tree, node, parent = None, level = 0):
-        """
-         - Converts a tree to a dictionary, where keys are the
-         - the node's ID and values are nodeInfo entries as above.
-         - Args:
-            - tree   - A NetworkX tree object
-            - node   - Node to add to the dictionary.
-            - parent - The node's parent if it exists.
-            - level  - The level in the tree that the node is on.
-        """
-        if level not in lDict:        lDict[level] = []
-        if node  not in lDict[level]: lDict[level].append(node)
+    """
+     - Converts a tree to a dictionary, where keys are the
+     - the node's ID and values are nodeInfo entries as above.
+     - Args:
+        - tree   - A NetworkX tree object
+        - node   - Node to add to the dictionary.
+        - parent - The node's parent if it exists.
+        - level  - The level in the tree that the node is on.
+    """
+    nodeChildren = [i for i in tree.neighbors(node) if i not in tDict]
+    tDict[node]  = nodeInfo(level, parent, nodeChildren)
 
-        nodeChildren = [i for i in tree.neighbors(node) if i not in tDict]
-        tDict[node]  = nodeInfo(level, parent, nodeChildren)
+    for child in nodeChildren: genTreeDicts(tree, child, parent = node, level = level + 1)
 
-        for child in nodeChildren: genTreeDicts(tree, child, parent = node, level = level + 1)
-
-
-lDict = dict()
 tDict = dict()
 
 tree = nx.random_tree(int(sys.argv[1]))
