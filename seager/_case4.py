@@ -7,11 +7,24 @@ def case4(self, p, w, d1, k):
      - Case 4: d = 4, so dk-1 and dk+1 will contain nodes
     """
     if self["dkPlus"]    == []:    #dk+1 empty, target in dkMinus, these are siblings so lemma 2
+        vkMinus2 = self.tDict[p].parent
+        vkMinus2 = self.tDict[vkMinus2].parent
+        
+        if d1 == 4: vkMinus2 = self.tDict[vkMinus2].parent
+        
+        """print("Children:", self.tDict[vkMinus2].children)
+        print("dk-1:", self["dkMinus"])
+        print("dk:", self["dk"])
+        print("dk+1:", self["dkPlus"])
+        print("Probes:", self["probeList"])
+        print("Target locations:", self["t"])"""
+        
         try:
-            return lemma2(self, self.tDict[self["dkMinus"][0]].parent, self["dkMinus"][0], self["dkMinus"][-1])
+            return lemma2(self, self.tDict[vkMinus2].parent, self.tDict[vkMinus2].children[1], self.tDict[vkMinus2].children[-1])
             
         except:
-            print("Lemma 2 failed")
+            #print("Lemma 2 failed")
+            None
 
     elif self["dkMinus"] == []:     #dk-1 empty, so target set in dkPlus (children(wk, zk)) so lemma 4
         return self.lemma4(self.tDict[self["dkPlus"][0]].parent, self.tDict[self["dkPlus"][-1]].parent, k + 1)
@@ -20,11 +33,10 @@ def case4(self, p, w, d1, k):
     
     p2, minus = (zkMinus, 1) if self.tDict[zkMinus].children == [] else (self.tDict[zkMinus].children[0], 0)
 
-    if p2 == self["t"][-1]: return self.located(p2)
     d2 = self.probe(p2)  #Probe zk's first child or zk if there are no children
 
-    if d2 == 1:
-        return self.located(self.tDict[p2].parent)
+    if d2 == 0: return self.located(p2)
+    if d2 == 1: return self.located(self.tDict[p2].parent)
         
     elif d2 == 2:
         if minus:
@@ -33,11 +45,10 @@ def case4(self, p, w, d1, k):
         if len(self.tDict[zkMinus].children) == 1:    #zk is zk-1's only child, target at zk's parent
             return self.located(self.tDict[zkMinus].parent)
         
-        if w == self["t"][-1]: return self.located(w)
         d3 = self.probe(w)
 
-        if d3 == 1:
-            return self.located(self.tDict[w].parent)
+        if d3 == 0: return self.located(w)
+        if d3 == 1: return self.located(self.tDict[w].parent)
 
         elif d3 == 2:
             vkMinus2 = self.tDict[w].parent

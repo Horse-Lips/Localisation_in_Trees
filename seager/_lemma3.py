@@ -11,31 +11,22 @@ def lemma3(self, u, v, w, z):
         - w - The leftmost sibling in the children of v.
         - z - The rightmost sibling in the children of v.
     """
-    if self.tDict[u].parent is not None:
-        p, d = self.tDict[u].parent, 0
+    if self.tDict[u].parent is not None: p, d = self.tDict[u].parent, 0
+    else:                                p, d = u,                    1
 
-    else:
-        p, d = u, 1
-
-    if p == self["t"][-1]: return self.located(p)
     d1 = self.probe(p)
-        
-    if d1 == 1:
-        return self.located(self.tDict[p].children[0])
+
+    if d1 == 0: return self.located(p)
+    if d1 == 1: return self.located(self.tDict[p].children[0])
 
     elif d1 == 2:
-        if d:
-            return lemma2(self, v, w, z)
-
-        return self.located(v)
+        if d: return lemma2(self, v, w, z)
+        else: return self.located(v)
 
     elif d1 == 3:
-        if d:
-            return self.lemma4(w, z, self.tDict[w].level + 1)
+        if d: return self.lemma4(w, z, self.tDict[w].level + 1)
+        else: return lemma2(self, v, w, z)
 
-        lemma2(self, v, w, z)
-
-    elif d1 == 4:
-        return self.lemma4(w, z, self.tDict[w].level + 1)
+    elif d1 == 4: return self.lemma4(w, z, self.tDict[w].level + 1)
 
     raise Exception("Reached end of play function")

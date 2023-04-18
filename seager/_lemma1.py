@@ -11,32 +11,23 @@ def lemma1(self):
         - -1 if a hideout is detected in the tree
     """
     labelMap = dict()
-
+    
     for node in self.tDict:
-        if node == "leaves":
-            continue
-            
-        oldChildren = self.tDict[node].children
-
-        if len(oldChildren) < 3:
-            continue
-
-        childDegs = [len(self.tDict[child].children) for child in oldChildren]
-        deg3Count    = sum(deg >= 2 for deg in childDegs)
-
-        if deg3Count > 2:
-            return -1
+        oldChildren = self.tDict[node].children #Get node's children
         
-        maxDeg = childDegs.index(max(childDegs))    #Slow but gets max value
-        secDeg = 0
-
+        if len(oldChildren) == 1: continue
+            
+        childDegs   = [(len(self.tDict[child].children) + 1) for child in oldChildren]  #Degree's of node's children
+        
+        if sum(childDegs) == len(childDegs): continue
+        
+        maxDeg      = childDegs.index(max(childDegs))    #Slow but gets max value
+        secDeg      = 0
+        
         for i in range(len(childDegs)):
             if childDegs[maxDeg] > childDegs[i] > childDegs[secDeg]:
                 secDeg = i
-
-        if sum(childDegs) != len(childDegs):    #Don't adjust children if all have degree 1
-            continue
-
+        
         if maxDeg != 0: #Dont adjust max if its already at index 0
             labelMap[oldChildren[maxDeg]]        = oldChildren[0]
             labelMap[oldChildren[0]]             = oldChildren[maxDeg]
@@ -55,4 +46,3 @@ def lemma1(self):
     self.createTDict("0")
 
     return 1
-

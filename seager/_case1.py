@@ -24,11 +24,10 @@ def case1(self, p, w, d1, k):
     s  = self.tDict[w].children[-2]  #s is the child to the left of zk
 
     if len(self.tDict[zk].children) > 1: #zk has > 1 child, then w.parent has <= 1 child, probe zk
-        if zk == self["t"][-1]: return self.located(zk)
         d2 = self.probe(zk)
 
-        if d2 == 1:   #If d2 is 1 then the target is at w
-            return self.located(w)
+        if d2 == 0: return self.located(zk)
+        if d2 == 1: return self.located(w)
 
         elif d2 == 2: #Target set is w's parent and w's children (minus zk)
             if vkMinus2 is None:  #If w is the root it has no parent, lemma 2 on w's children
@@ -44,11 +43,10 @@ def case1(self, p, w, d1, k):
 
     #Now if zk has at most one child, then we probe w's parent
     elif len(self.tDict[zk].children) <= 1:
-        if vkMinus2 == self["t"][-1]: return self.located(vkMinus2)
         d2 = self.probe(vkMinus2)
 
-        if d2 == 1:   #If d2 is 1 then the target is at w
-            return self.located(w)
+        if d2 == 0: return self.located(vkMinus2)
+        if d2 == 1: return self.located(w)  #If d2 is 1 then the target is at w
 
         elif d2 == 2:   #If d2 == 2 then the target is in siblings(vk, zk) so lemma 2
             return lemma2(self, w, vk, zk)

@@ -23,13 +23,13 @@ def case5(self, p, w, d1, zkMinus):
     zkMinus2 = self.tDict[zkMinus].parent
 
     if zkMinus == self.tDict[zkMinus2].children[-1]:
-        if self["vl"] == self["t"][-1]: return self.located(self["vl"])
         d2 = self.probe(self["vl"])
+        if d2 == 0: return self.located(self["vl"])
         return case5a(self, p, w, d1, d2)
 
     elif zkMinus == self.tDict[zkMinus2].children[0] and len(self.tDict[zkMinus2].children) > 1 and len(self.tDict[zkMinus].children) > 1:
-        if self.tDict[zkMinus].parent == self["t"][-1]: return self.located(self.tDict[zkMinus].parent)
         d2 = self.probe(self.tDict[zkMinus].parent)
+        if d2 == 0: return self.located(self.tDict[zkMinus].parent)
         return case5b(self, p, w, d1, d2)
 
     elif zkMinus != self.tDict[zkMinus2].children[-1] and len(self.tDict[zkMinus].children) < 2:
@@ -225,8 +225,8 @@ def case5bExtraCase(self, p, w, d1, d2):
             return self.lemma4(q, R, self.tDict[q].level + 1)
 
         lVariables(self, d2, p)
-        if self["vl"] == self["t"][-1]: return self.located(self["vl"])
         d3 = self.probe(self["vl"])
+        if d3 == 0: return self.located(self["vl"])
 
         self["dkMinus"] = self.children(self.tDict[s].parent, self.tDict[t].parent)
         self["dk"]      = []
@@ -243,24 +243,21 @@ def case5c(self, p, w, d1):
     zk       = self.tDict[zkMinus].children[0]
     zkMinusPred   = self["dkMinus"][self["dkMinus"].index(zkMinus) - 1]
 
-    if zk == self["t"][-1]: return self.located(zk)
     d2 = self.probe(zk)
 
-    if d2 == 1:
-        return self.located(self["dkMinus"][-1])
-
-    elif d2 == 2:
-        return self.located(self.tDict[self["dkMinus"][-1]].parent)
+    if d2 == 0:   return self.located(zk)
+    if d2 == 1:   return self.located(self["dkMinus"][-1])
+    elif d2 == 2: return self.located(self.tDict[self["dkMinus"][-1]].parent)
 
     elif d2 == 3:
         t = self.tDict[zkMinus2].children[0]
-
         return lemma2(self, zkMinus2, t, zkMinusPred)
 
     elif d2 == 4:
         zkMinus3 = self.tDict[zkMinus2].parent
-        if zkMinus3 == self["t"][-1]: return self.located(zkMinus3)
         d3 = self.probe(zkMinus3)
+        
+        if d3 == 0: return self.located(zkMinus3)
 
         if d3 == 1:
             zkMinus3Children = self.tDict[zkMinus3].children
