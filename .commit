@@ -1,7 +1,1 @@
-Ran experiments, general tidying, fixed some Seager
-
-- Moved old results to oldResults folder
-- Created new results folder
-- Ran experiments, results in results folder
-- Capped trees to 150 nodes, 150-200 in backupTrees folder
-- Some work on Seager to tidy up and fix some code
+Added plots to results folder
