@@ -1,12 +1,5 @@
 from networkx import shortest_path_length, single_source_dijkstra_path_length
 from random   import choice
-from ._lemma1 import lemma1
-from ._lemma2 import lemma2
-from ._case1  import case1
-from ._case2  import case2
-from ._case3  import case3
-from ._case4  import case4
-from ._case5  import case5
 import os
 
 
@@ -70,11 +63,9 @@ class Seager:
         """
         d = self.probe("0")
 
-        if d == 0: return self.located("0")
-
-        if lemma1(self) == 1:  #Organise tree and check for hideouts
-            if len(self.lDict[d]) == 1: return self.located(self.lDict[d][0])
-            else:                       return self.lemma4(self.tDict[self.lDict[d][0]].parent, self.tDict[self.lDict[d][-1]].parent, d)
+        if   d == 0:                  return self.located("0")
+        elif len(self.lDict[d]) == 1: return self.located(self.lDict[d][0])
+        else:                         return self.lemma4(self.tDict[self.lDict[d][0]].parent, self.tDict[self.lDict[d][-1]].parent)
 
 
     def lemma2(self, v, w, z):
@@ -116,7 +107,7 @@ class Seager:
         elif d1 == 2:
             if   not d:             return self.located(v)
             elif len(sibList) == 2: return self.located(sibList[1])
-            else:                   return self.lemma2(self, v, sibList[1 - r], sibList[-1 - r])
+            else:                   return self.lemma2(v, sibList[1 - r], sibList[-1 - r])
 
         elif d1 == 3:
             if d:
@@ -124,16 +115,45 @@ class Seager:
                 else:                 return self.lemma4(sibList[1 - r], sibList[-1 - r], self.tDict[w].level + 1)
 
             if len(sibList) == 2: return self.located(sibList[1 - r])
-            else:                 return self.lemma2(self, v, sibList[1 - r], sibList[-1 - r])
+            else:                 return self.lemma2(v, sibList[1 - r], sibList[-1 - r])
 
         elif d1 == 4:
             if len(sibList) == 2: return self.lemma4(sibList[1 - r], sibList[1 - r], self.tDict[w].level + 1)
             else:                 return self.lemma4(sibList[1 - r], sibList[-1 - r], self.tDict[w].level + 1)
+        
+
+    def lemma3(self, u, v, w, z):
+        """
+         - Lemma 3: Given u with unique child v with w and z in its children,
+         - either locates the robber at u or v, or applies Lemma 2 to v, w, z.
+         - Args:
+            - u - The parent of v.
+            - v - The root of the subtree in lemma 2.
+            - w - The leftmost sibling in the children of v.
+            - z - The rightmost sibling in the children of v.
+        """
+        if self.tDict[u].parent is not None: p, d = self.tDict[u].parent, 0
+        else:                                p, d = u,                    1
+
+        d1 = self.probe(p)
+
+        if d1 == 0: return self.located(p)
+        if d1 == 1: return self.located(self.tDict[p].children[0])
+
+        elif d1 == 2:
+            if d: return self.lemma2(v, w, z)
+            else: return self.located(v)
+
+        elif d1 == 3:
+            if d: return self.lemma4(w, z, self.tDict[w].level + 1)
+            else: return self.lemma2(v, w, z)
+
+        elif d1 == 4: return self.lemma4(w, z, self.tDict[w].level + 1)
 
         raise Exception("Reached end of play function")
-
-
-    def lemma4(self, w, z, k):
+    
+    
+    def lemma4(self, w, z):
         """
          - Applies return lemma 4 which, when the target set is contained
          - in Children(w, z) with w and z on the same level with
@@ -148,7 +168,7 @@ class Seager:
         if w == z and self.tDict[w].children == []: return self.located(w)
 
         w, z      = self.reduceSet(w, z)    #Replace w with w', z with z' if no children
-        self["k"] = k                       #Set global value of level k
+        self["k"] = self.tDict[w].level + 1 #Set global value of level k
         self.setDSets(w, z)                 #Set dk to Children(w, z) and expand
 
         if len(self["dk"]) == 1: return self.located(self["dk"][0])
@@ -159,28 +179,36 @@ class Seager:
         d1   = self.probe(p)
         ds   = self.updateDSets(p, d1)
 
-        if ds != -1: return self.located(ds)
-        if d1 == 0:  return self.located(p)
-        if d1 == 1:  return self.located(self.tDict[p].parent)
+        if ds != -1: return self.located(ds)    #Dist set update resulted in 1 possible target location
+        
+        if d1 == 0:
+            return self.located(p)
+            
+        if d1 == 1:
+            return self.located(self.tDict[p].parent)
 
         elif d1 == 2:
-            #If probed vk and d1 == 2 then return lemma 2 w's other children
-            if d: return self.lemma2(self, w, self["dk"][1], self["dk"][-1])
-            #elif  w == z and len(self.tDict[vk].children) == 1: return self.located(w)
-            else: return case1(self, p, w, d1, k)
+            if d: return self.lemma2(w, self["dk"][1], self["dk"][-1])  #If probed vk and d1 == 2 then return lemma 2 w's other children
+            else: return self.case1(p, w, d1)   #elif  w == z and len(self.tDict[vk].children) == 1: return self.located(w)
 
-        elif d1 == 3:
-            #If probed vk and d1 == 3 then case 4 (dk-1 and dk+1 non-empty)
-            if d: return case4(self, p, w, d1, k)
-            else: return case2(self, p, w, d1, k)
+        elif d1 == 3:   #If probed vk and d1 == 3 then case 4 (dk-1 and dk+1 non-empty)
+            if d: return self.case4(p, w, d1)
+            else: return self.case2(p, w, d1)
 
-        elif d1 == 4:
-            #If probed vk and d1 == 4 then target in subset of Children(w, z)
-            if d: return self.lemma4(self.tDict[self["dk"][0]].parent, self.tDict[self["dk"][-1]].parent, k)
-            else: return case4(self, p, w, d1, k)
+        elif d1 == 4:   #If probed vk and d1 == 4 then target in subset of Children(w, z)
+            if d: return self.lemma4(self.tDict[self["dk"][0]].parent, self.tDict[self["dk"][-1]].parent)
+            else: return self.case4(p, w, d1)
 
         elif d1 % 2 == 1 and d1 > 3:
-            if d:   #If vk probed then dk+1 and dk-1 possible
+            if d: return self.case5(p, w, d1, self["dkMinus"][-1])
+            else: return self.case3(p, w, d1)
+        
+        elif d1 % 2 == 0 and d1 > 5:
+            if d: return self.case3(p, w, d1)
+            else: return self.case5(p, w, d1, self["dkMinus"][-1])
+            
+        """elif d1 % 2 == 1 and d1 > 3:
+            if d: return self.case5(self, p, w, d1, self["dkMinus"][-1])
                 if self["dkMinus"] == [] and self["dkPlus"] != []:
                     return self.lemma4(self.tDict[self["dkPlus"][0]].parent, self.tDict[self["dkPlus"][-1]].parent, self["k"] + 1)
 
@@ -195,10 +223,10 @@ class Seager:
                     None
 
                 else:
-                    return case5(self, p, w, d1, self["dkMinus"][-1])
+                    return 
 
             else:
-                return case3(self, p, w, d1, k)
+                return self.case3(self, p, w, d1, k)
 
         elif d1 % 2 == 0 and d1 > 5:
             if d:
@@ -212,12 +240,134 @@ class Seager:
                 try: return self.lemma4(self.tDict[self["dkMinus"][0]].parent, self.tDict[self["dkMinus"][-1]].parent, k - 1)
                 except: raise Exception("Sets empty")
             else:
-                try: case5(self, p, w, d1, self["dkMinus"][-1])
+                try: self.case5(self, p, w, d1, self["dkMinus"][-1])
                 except: raise Exception("Sets empty")
                 
-        raise Exception("Reached end of return lemma4 function")
+        raise Exception("Reached end of return lemma4 function")"""
 
 
+    def case1(self, p, w, d1):
+        """
+         - Case 1: d = 2 and therefore the target set 
+         - contains w (vk-1) and  children(vk) excluding vk+1.
+         - Args:
+            - vk - The leftmost child of w.
+            - d  - The distance between the previous probe and the target.
+        """
+        if self["dkPlus"] == []: #If vk has no children, target located at its parent
+            return self.located(self["dkMinus"][0])
+
+        elif len(self.tDict[w].children) == 1: #If vk is the unique child of w then lemma 3
+            return self.lemma3(w, self.tDict[p].parent, self["dkPlus"][0], self["dkPlus"][-1])
+
+        #Otherwise w has more than one child, zk is its rightmost child
+        vkMinus2 = self.tDict[w].parent  #vk-2 is w's parent
+        vk = self.tDict[w].children[0]   #vk is w's leftmost child
+        yk = self.tDict[w].children[1]   #yk is the child to the right of vk
+        zk = self.tDict[w].children[-1]  #zk is w's rightmost child
+        s  = self.tDict[w].children[-2]  #s is the child to the left of zk
+
+        if len(self.tDict[zk].children) > 1: #zk has > 1 child, then w.parent has <= 1 child, probe zk
+            d2 = self.probe(zk)
+
+            if d2 == 0: return self.located(zk)
+            if d2 == 1: return self.located(w)
+
+            elif d2 == 2: #Target set is w's parent and w's children (minus zk)
+                if vkMinus2 is None: return self.lemma2(w, vk, s) #If w is the root it has no parent, lemma 2 on w's children
+                else:                return self.lemma3(vkMinus2, w,  vk,  s)
+
+            elif d2 == 3: return self.lemma2(vk, self["dkPlus"][0], self["dkPlus"][-1]) #If d2 is 3 then target is in children(vk) excluding vk + 1, so lemma 2
+            elif d2 == 4: return self.lemma4(self["dkPlus"][0], self["dkPlus"][-1], self.tDict[self["dkPlus"][0]].level + 1) #If d2 is 4 then the target is in children(wk+1, xk+1)
+
+        #Now if zk has at most one child, then we probe w's parent
+        elif len(self.tDict[zk].children) <= 1:
+            d2 = self.probe(vkMinus2)
+
+            if d2 == 0:   return self.located(vkMinus2)
+            if d2 == 1:   return self.located(w)  #If d2 is 1 then the target is at w
+            elif d2 == 2: return self.lemma2(w, vk, zk) #If d2 == 2 then the target is in siblings(vk, zk) so lemma 2
+            elif d2 == 3: return self.lemma2(vk, self["dkPlus"][0], self["dkPlus"][-1]) #If d2 is 3 then target is in children(vk) excluding vk + 1, so lemma 2
+            elif d2 == 4: return self.lemma4(self["dkPlus"][0], self["dkPlus"][-1], self.tDict[self["dkPlus"][0]].level + 1) #If d2 is 4 then the target is in children(wk+1, xk+1)
+
+        raise Exception("Reached end of play function")
+    
+
+    def case2(self, p, w, d):
+        """
+         - Case 2: d is 2 or 3, so the target set is the children of w minus vk.
+         - Args:
+            - w  - The leftmost sibling in siblings(w, z) in lemma 4.
+            - vk - The leftmost child of w.
+        """
+        if len(self["dk"]) == 1: return self.located(self["dk"][0])
+        else:                    return self.lemma2(w, self["dk"][0], self["dk"][-1])
+    
+
+    def case3(self, p, w, d):
+        """
+         - Case 3: d is odd and greater than 3, so the target set contains all nodes
+         - on level k that are d away. i.e children(yk-1, zk-1), so call Lemma 4 on.
+        """
+        if len(self["dk"]) == 1: return self.located(self["dk"][0])
+        else:                    return self.lemma4(self["dkMinus"][0], self["dkMinus"][0], self["k"])
+    
+
+    def case4(self, p, w, d1):
+        """
+         - Case 4: d = 4, so dk-1 and dk+1 will contain nodes
+        """
+        if   self["dkPlus"]    == []:    #dk+1 empty, target in dkMinus, these are siblings so lemma 2
+            return self.lemma2(self.tDict[self["dkMinus"][0]].parent, self.["dkMinus"][0], self.["dkMinus"][0][-1])
+
+        elif self["dkMinus"] == []:     #dk-1 empty, so target set in dkPlus (children(wk, zk)) so lemma 4
+            return self.lemma4(self.tDict[self["dkPlus"][0]].parent, self.tDict[self["dkPlus"][-1]].parent)
+
+        zkMinus   = self["dkMinus"][-1]     #Get zk, wk-2's rightmost child
+        p2, minus = (zkMinus, 1) if self.tDict[zkMinus].children == [] else (self.tDict[zkMinus].children[0], 0)
+        d2        = self.probe(p2)          #Probe zk's first child or zk if there are no children
+
+        if d2 == 0: return self.located(p2)
+        if d2 == 1: return self.located(self.tDict[p2].parent)
+            
+        elif d2 == 2:
+            if minus:                                  return self.lemma2(self.tDict[zkMinus].parent, self["dkMinus"][0], self["dkMinus"][-2])
+            if len(self.tDict[zkMinus].children) == 1: return self.located(self.tDict[zkMinus].parent) #zk is zk-1's only child, target at zk's parent
+            
+            d3 = self.probe(w)
+
+            elif d3 == 2:
+                vkMinus2 = self.tDict[w].parent
+                vkMinus3 = self.tDict[self.tDict[w].parent].parent
+
+                if vkMinus3 is None: return self.lemma2(vkMinus2, self["dkMinus"][0], self["dkMinus"][-1])
+                else:                return self.lemma3(vkMinus3, vkMinus2, self["dkMinus"][0], self["dkMinus"][-1])
+
+            elif d3 == 3:
+                return self.lemma2(zkMinus, self.tDict[zkMinus].children[1], self.tDict[zkMinus].children[-1])
+
+            elif d3 == 4:
+                return self.lemma4(self.tDict[zkMinus].children[1], self.tDict[zkMinus].children[-1])
+
+        elif d2 == 3:
+            if minus:                       return self.lemma4(w, self["dkMinus"][-2]) #Same as d2 == 4 and no minus
+            elif len(self["dkMinus"]) == 2: return self.located(self["dkMinus"][0]) #there's one other vertex on zk.level, it's 3 away so target found
+            else:                           return self.lemma2(self.tDict[zkMinus].parent, self["dkMinus"][0], self["dkMinus"][-2]) #Otherwise the target is in the siblings of wk-2's children, so lemma 2
+
+        elif d2 == 4:
+            if minus: return self.lemma4(self.tDict[self["dkPlus"][0]].parent, self.tDict[self["dkPlus"][-1]].parent) #Same as d2 == 5 and no minus
+            else:     return self.lemma4(w, self["dkMinus"][-2])
+
+        elif d2 == 5:
+            if minus: return self.lemma4(self["dkPlus"][0], self["dkPlus"][-1])
+            else:     return self.lemma4(self.tDict[self["dkPlus"][0]].parent, self.tDict[self["dkPlus"][-1]].parent) #If d = 5 then the target is in the children of the children of w (apart from vk)
+
+        elif d2 == 6:
+            return self.lemma4(self["dkPlus"][0], self["dkPlus"][-1])
+
+        raise Exception("Reached end of play function")
+    
+    
     def probe(self, v):
         """
          - Returns the distance from v to the target
@@ -239,10 +389,7 @@ class Seager:
          - Updates the sets Dk-1, Dk, Dk+1
         """
         distances = single_source_dijkstra_path_length(self.tree, v)
-        
-        dkMinus = []
-        dk      = []
-        dkPlus  = []
+        dkMinus, dk, dkPlus = [], [], []
 
         tSet = self["dkMinus"] + self["dk"] + self["dkPlus"]
 
@@ -253,11 +400,10 @@ class Seager:
                 elif self.tDict[i].level == self["k"] + 1: dkPlus.append(i)
 
         tSetNew = dkMinus + dk + dkPlus
-
-        if len(tSetNew) == 1: return tSetNew[0]
-
         self["dkMinus"], self["dk"], self["dkPlus"] = dkMinus, dk, dkPlus
-        return -1
+        
+        if len(tSetNew) == 1: return tSetNew[0]
+        else:                 return -1
 
 
     def setDSets(self, w, z):

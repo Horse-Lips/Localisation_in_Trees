@@ -35,14 +35,14 @@ def lemma2(self, v, w, z):
     if d1 == 1: return self.located(self.tDict[p].parent)
         
     elif d1 == 2:
-        if not d:             return self.located(v)
-        if len(sibList) == 2: return self.located(sibList[1])
-        else:                 return lemma2(self, v, sibList[1 - r], sibList[-1 - r])
+        if   not d:             return self.located(v)
+        elif len(sibList) == 2: return self.located(sibList[1])
+        else:                   return lemma2(self, v, sibList[1 - r], sibList[-1 - r])
 
     elif d1 == 3:
         if d:
             if len(sibList) == 2: return self.lemma4(sibList[1 - r], sibList[1 - r], self.tDict[w].level + 1)
-            else: return self.lemma4(sibList[1 - r], sibList[-1 - r], self.tDict[w].level + 1)
+            else:                 return self.lemma4(sibList[1 - r], sibList[-1 - r], self.tDict[w].level + 1)
 
         if len(sibList) == 2: return self.located(sibList[1 - r])
         else:                 return lemma2(self, v, sibList[1 - r], sibList[-1 - r])
