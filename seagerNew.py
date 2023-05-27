@@ -111,15 +111,15 @@ class Seager:
 
         elif d1 == 3:
             if d:
-                if len(sibList) == 2: return self.lemma4(sibList[1 - r], sibList[1 - r], self.tDict[w].level + 1)
-                else:                 return self.lemma4(sibList[1 - r], sibList[-1 - r], self.tDict[w].level + 1)
+                if len(sibList) == 2: return self.lemma4(sibList[1 - r], sibList[1 - r])
+                else:                 return self.lemma4(sibList[1 - r], sibList[-1 - r])
 
             if len(sibList) == 2: return self.located(sibList[1 - r])
             else:                 return self.lemma2(v, sibList[1 - r], sibList[-1 - r])
 
         elif d1 == 4:
-            if len(sibList) == 2: return self.lemma4(sibList[1 - r], sibList[1 - r], self.tDict[w].level + 1)
-            else:                 return self.lemma4(sibList[1 - r], sibList[-1 - r], self.tDict[w].level + 1)
+            if len(sibList) == 2: return self.lemma4(sibList[1 - r], sibList[1 - r])
+            else:                 return self.lemma4(sibList[1 - r], sibList[-1 - r])
         
 
     def lemma3(self, u, v, w, z):
@@ -145,10 +145,10 @@ class Seager:
             else: return self.located(v)
 
         elif d1 == 3:
-            if d: return self.lemma4(w, z, self.tDict[w].level + 1)
+            if d: return self.lemma4(w, z)
             else: return self.lemma2(v, w, z)
 
-        elif d1 == 4: return self.lemma4(w, z, self.tDict[w].level + 1)
+        elif d1 == 4: return self.lemma4(w, z)
 
         raise Exception("Reached end of play function")
     
@@ -189,64 +189,26 @@ class Seager:
 
         elif d1 == 2:
             if d: return self.lemma2(w, self["dk"][1], self["dk"][-1])  #If probed vk and d1 == 2 then return lemma 2 w's other children
-            else: return self.case1(p, w, d1)   #elif  w == z and len(self.tDict[vk].children) == 1: return self.located(w)
+            else: return self.case1(w)   #elif  w == z and len(self.tDict[vk].children) == 1: return self.located(w)
 
         elif d1 == 3:   #If probed vk and d1 == 3 then case 4 (dk-1 and dk+1 non-empty)
-            if d: return self.case4(p, w, d1)
-            else: return self.case2(p, w, d1)
+            if d: return self.case4(w)
+            else: return self.case2(w)
 
         elif d1 == 4:   #If probed vk and d1 == 4 then target in subset of Children(w, z)
             if d: return self.lemma4(self.tDict[self["dk"][0]].parent, self.tDict[self["dk"][-1]].parent)
-            else: return self.case4(p, w, d1)
+            else: return self.case4(w)
 
         elif d1 % 2 == 1 and d1 > 3:
             if d: return self.case5(p, w, d1, self["dkMinus"][-1])
-            else: return self.case3(p, w, d1)
+            else: return self.case3(w)
         
         elif d1 % 2 == 0 and d1 > 5:
-            if d: return self.case3(p, w, d1)
+            if d: return self.case3(w)
             else: return self.case5(p, w, d1, self["dkMinus"][-1])
-            
-        """elif d1 % 2 == 1 and d1 > 3:
-            if d: return self.case5(self, p, w, d1, self["dkMinus"][-1])
-                if self["dkMinus"] == [] and self["dkPlus"] != []:
-                    return self.lemma4(self.tDict[self["dkPlus"][0]].parent, self.tDict[self["dkPlus"][-1]].parent, self["k"] + 1)
-
-                elif self["dkPlus"] == [] and self["dkMinus"] != []:
-                    return self.lemma4(self.tDict[self["dkMinus"][0]].parent, self.tDict[self["dkMinus"][-1]].parent, self["k"] - 1)
-
-                elif self["dkMinus"] == [] and self["dkPlus"] == []:
-                    #print("====== Lemma 4 line 138 - dkPlus and dkMinus both empty ======")
-                    #print(self["dkMinus"])
-                    #print(self["dk"])
-                    #print(self["dkPlus"])
-                    None
-
-                else:
-                    return 
-
-            else:
-                return self.case3(self, p, w, d1, k)
-
-        elif d1 % 2 == 0 and d1 > 5:
-            if d:
-                return self.lemma4(self.tDict[self["dkMinus"][0]].parent, self.tDict[self["dk"][-1]].parent, k)
-
-            #NOTE THESE OCCUR OFTEN
-            elif self["dkMinus"] == []:
-                try: return self.lemma4(self.tDict[self["dkPlus"][0]].parent, self.tDict[self["dkPlus"][-1]].parent, k + 1)
-                except: raise Exception("Sets empty")
-            elif self["dkPlus"] == []:
-                try: return self.lemma4(self.tDict[self["dkMinus"][0]].parent, self.tDict[self["dkMinus"][-1]].parent, k - 1)
-                except: raise Exception("Sets empty")
-            else:
-                try: self.case5(self, p, w, d1, self["dkMinus"][-1])
-                except: raise Exception("Sets empty")
-                
-        raise Exception("Reached end of return lemma4 function")"""
 
 
-    def case1(self, p, w, d1):
+    def case1(self, w):
         """
          - Case 1: d = 2 and therefore the target set 
          - contains w (vk-1) and  children(vk) excluding vk+1.
@@ -258,7 +220,7 @@ class Seager:
             return self.located(self["dkMinus"][0])
 
         elif len(self.tDict[w].children) == 1: #If vk is the unique child of w then lemma 3
-            return self.lemma3(w, self.tDict[p].parent, self["dkPlus"][0], self["dkPlus"][-1])
+            return self.lemma3(w, self.tDict[w].children[0], self["dkPlus"][0], self["dkPlus"][-1])
 
         #Otherwise w has more than one child, zk is its rightmost child
         vkMinus2 = self.tDict[w].parent  #vk-2 is w's parent
@@ -278,7 +240,7 @@ class Seager:
                 else:                return self.lemma3(vkMinus2, w,  vk,  s)
 
             elif d2 == 3: return self.lemma2(vk, self["dkPlus"][0], self["dkPlus"][-1]) #If d2 is 3 then target is in children(vk) excluding vk + 1, so lemma 2
-            elif d2 == 4: return self.lemma4(self["dkPlus"][0], self["dkPlus"][-1], self.tDict[self["dkPlus"][0]].level + 1) #If d2 is 4 then the target is in children(wk+1, xk+1)
+            elif d2 == 4: return self.lemma4(self["dkPlus"][0], self["dkPlus"][-1]) #If d2 is 4 then the target is in children(wk+1, xk+1)
 
         #Now if zk has at most one child, then we probe w's parent
         elif len(self.tDict[zk].children) <= 1:
@@ -288,12 +250,12 @@ class Seager:
             if d2 == 1:   return self.located(w)  #If d2 is 1 then the target is at w
             elif d2 == 2: return self.lemma2(w, vk, zk) #If d2 == 2 then the target is in siblings(vk, zk) so lemma 2
             elif d2 == 3: return self.lemma2(vk, self["dkPlus"][0], self["dkPlus"][-1]) #If d2 is 3 then target is in children(vk) excluding vk + 1, so lemma 2
-            elif d2 == 4: return self.lemma4(self["dkPlus"][0], self["dkPlus"][-1], self.tDict[self["dkPlus"][0]].level + 1) #If d2 is 4 then the target is in children(wk+1, xk+1)
+            elif d2 == 4: return self.lemma4(self["dkPlus"][0], self["dkPlus"][-1]) #If d2 is 4 then the target is in children(wk+1, xk+1)
 
         raise Exception("Reached end of play function")
     
 
-    def case2(self, p, w, d):
+    def case2(self, w):
         """
          - Case 2: d is 2 or 3, so the target set is the children of w minus vk.
          - Args:
@@ -304,21 +266,21 @@ class Seager:
         else:                    return self.lemma2(w, self["dk"][0], self["dk"][-1])
     
 
-    def case3(self, p, w, d):
+    def case3(self, w):
         """
          - Case 3: d is odd and greater than 3, so the target set contains all nodes
          - on level k that are d away. i.e children(yk-1, zk-1), so call Lemma 4 on.
         """
         if len(self["dk"]) == 1: return self.located(self["dk"][0])
-        else:                    return self.lemma4(self["dkMinus"][0], self["dkMinus"][0], self["k"])
+        else:                    return self.lemma4(self["dkMinus"][0], self["dkMinus"][0])
     
 
-    def case4(self, p, w, d1):
+    def case4(self, w):
         """
          - Case 4: d = 4, so dk-1 and dk+1 will contain nodes
         """
         if   self["dkPlus"]    == []:    #dk+1 empty, target in dkMinus, these are siblings so lemma 2
-            return self.lemma2(self.tDict[self["dkMinus"][0]].parent, self.["dkMinus"][0], self.["dkMinus"][0][-1])
+            return self.lemma2(self.tDict[self["dkMinus"][0]].parent, self["dkMinus"][0], self["dkMinus"][-1])
 
         elif self["dkMinus"] == []:     #dk-1 empty, so target set in dkPlus (children(wk, zk)) so lemma 4
             return self.lemma4(self.tDict[self["dkPlus"][0]].parent, self.tDict[self["dkPlus"][-1]].parent)
@@ -327,8 +289,11 @@ class Seager:
         p2, minus = (zkMinus, 1) if self.tDict[zkMinus].children == [] else (self.tDict[zkMinus].children[0], 0)
         d2        = self.probe(p2)          #Probe zk's first child or zk if there are no children
 
-        if d2 == 0: return self.located(p2)
-        if d2 == 1: return self.located(self.tDict[p2].parent)
+        if d2 == 0:
+            return self.located(p2)
+
+        if d2 == 1:
+            return self.located(self.tDict[p2].parent)
             
         elif d2 == 2:
             if minus:                                  return self.lemma2(self.tDict[zkMinus].parent, self["dkMinus"][0], self["dkMinus"][-2])
@@ -336,6 +301,12 @@ class Seager:
             
             d3 = self.probe(w)
 
+            if d3 == 0:
+                return self.located(w)
+            
+            elif d3 == 1:
+                return self.located(self.tDict[w].parent)
+                
             elif d3 == 2:
                 vkMinus2 = self.tDict[w].parent
                 vkMinus3 = self.tDict[self.tDict[w].parent].parent
@@ -367,7 +338,258 @@ class Seager:
 
         raise Exception("Reached end of play function")
     
-    
+
+    def lVariables(self, d, p):
+        self["l"] = self["k"] - (d // 2)    #Get level l in the tree (highest level path to target can reach)
+
+        self["vl"] = p              #Get vl
+        while self.tDict[self["vl"]].level != self["l"]:
+            self["vl"] = self.tDict[self["vl"]].parent
+
+        self["yl"] = p              #Get yl
+        while self.tDict[self["yl"]].level != self["l"]:
+            self["yl"] = self.tDict[self["yl"]].parent
+
+        self["zl"] = p              #Get zl
+        while self.tDict[self["zl"]].level != self["l"]:
+            self["zl"] = self.tDict[self["zl"]].parent
+
+
+    def case5(self, p, w, d1, zkMinus):
+        if   self["dkMinus"] == [] and self["dkPlus"] != []:
+            return self.lemma4(self.tDict[self["dkPlus"][0]].parent, self.tDict[self["dkPlus"][-1]].parent)
+        
+        elif self["dkMinus"] != [] and self["dkPlus"] == []:
+            return self.lemma4(self.tDict[self["dkMinus"][0]].parent, self.tDict[self["dkMinus"][-1]].parent)
+            
+        self.lVariables(d1, p)
+        zkMinus2 = self.tDict[zkMinus].parent
+
+        if zkMinus == self.tDict[zkMinus2].children[-1]:
+            d2 = self.probe(self["vl"])
+            return self.case5a(p, w, d1, d2, zkMinus)
+
+        elif zkMinus == self.tDict[zkMinus2].children[0] and len(self.tDict[zkMinus2].children) > 1 and len(self.tDict[zkMinus].children) > 1:
+            d2 = self.probe(self.tDict[zkMinus].parent)
+            if d2 == 0: return self.located(self.tDict[zkMinus].parent)
+            else:       return self.case5b(p, w, d1, d2, zkMinus)
+
+        elif zkMinus != self.tDict[zkMinus2].children[-1] and len(self.tDict[zkMinus].children) < 2:
+            return self.case5c(p, w, d1, zkMinus)
+            
+
+    def case5a(self, p, w, d1, d2, zkMinus):
+        wkPlus,  xkPlus  = self["dkPlus"][0],  self["dkPlus"][-1]
+        ykMinus = self["dkMinus"][0]
+
+        if   d2 == (d1 // 2) + 2: return self.lemma4(wkPlus, xkPlus)
+        elif d2 == (d1 // 2) + 1: return self.lemma4(self.tDict[wkPlus].parent, self.tDict[xkPlus].parent)
+        elif d2 == (d1 // 2) - 1: return self.lemma4(self.tDict[ykMinus].parent, self.tDict[zkMinus].parent)
+        elif d2 == (d1 // 2) - 2:
+            ykMinus2, zkMinus2 = self.tDict[ykMinus].parent,  self.tDict[zkMinus].parent
+
+            if d1 != 6: return self.lemma4(self.tDict[ykMinus2].parent, self.tDict[zkMinus2].parent)
+            else:       return self.lemma2(self.tDict[ykMinus2].parent, ykMinus2, zkMinus2)
+        elif d2 == d1 // 2:       return self.lemma4(self.tDict[self.tDict[wkPlus].parent].parent, zkMinus)
+        
+
+    def case5b(self, p, w, d1, d2, zkMinus):
+        wk = self.tDict[self["dkPlus"][0]].parent
+        xk = self.tDict[self["dkPlus"][-1]].parent
+
+        zkMinus2 = self.tDict[zkMinus].parent
+
+        zlPlus = self["dkMinus"][-1]
+
+        while self.tDict[zlPlus].level != self["l"]+ 1:
+            zlPlus = self.tDict[zlPlus].parent
+
+        if   d2 == 0:      return self.located(zkMinus2)
+        elif d2 == 1:      return self.located(zkMinus)
+        elif d2 == 2:      return self.lemma4(zkMinus, zkMinus)
+        elif d2 == d1:     return self.lemma4(self["dkMinus"][0], self["dkMinus"][-1])
+        elif d2 == d1 - 1: return self.lemma4(wk, xk)
+
+        elif d2 == d1 - 2:
+            return self.lemma4(self.tDict[wk].parent, self.tDict[zk].parent)
+            """kMinus   = self.lDict[self["k"] - 1]
+
+            for i in range(len(kMinus) - 1, 0, -1):
+                r = kMinus[i]
+
+                while r != zlPlus and r != self["zl"]:
+                    r = self.tDict[r].parent
+
+                if r == self["zl"]:
+                    t = kMinus[i]
+                    break
+
+            return self.lemma4(self.tDict[wk].parent, t, self.tDict[wk].level + 1)"""
+
+        #return self.case5bExtraCase(zkMinus2, w, d1, d2)
+
+
+    def case5bExtraCase(self, p, w, d1, d2):
+        #d2 is odd with 3 <= d2 <= d1 - 3 or similarly for case 5c
+        if d2 % 2 != 0 and (3 <= d2 <= d1 - 3 or 5 <= d2 <= d1 + 2):
+            m = (d2 - 1) / 2
+            levelPlus = self["k"] - m - 1
+
+            stPlus = self["dkMinus"][-1]
+            while self.tDict[stPlus].level != levelPlus:
+                stPlus = self.tDict[stPlus].parent
+
+            stRoot = self.tDict[stPlus].parent
+
+            kMinus   = self.lDict[self["k"] - 1]
+
+            for i in range(len(kMinus) - 1, 0, -1):
+                r = kMinus[i]
+
+                while r != stPlus and r != stRoot:
+                    r = self.tDict[r].parent
+
+                if r == stRoot:
+                    t = kMinus[i]
+                    break
+
+            for i in range(0, len(kMinus)):
+                r = kMinus[i]
+
+                while r != stPlus and r != stRoot:
+                    r = self.tDict[r].parent
+
+                if r == stRoot:
+                    s = kMinus[i]
+                    break
+
+            return self.lemma4(s, t)
+
+        elif d2 % 2 == 0 and (4 <= d2 <= d1 - 4 or 6 <= d2 <= d1 + 2):
+            m = d2 / 2
+
+            q, R, s, t = None, None, None, None
+
+            qrPlus = self["dkMinus"][-1]
+            while qrPlus is not None and self.tDict[qrPlus].level != self["k"] - m:
+                qrPlus = self.tDict[qrPlus].parent
+
+            if qrPlus is not None:
+                qrRoot = self.tDict[qrPlus].parent
+
+                levelK   = self.lDict[self["k"]]
+
+                for i in range(len(levelK) - 1, 0, -1):
+                    r = levelK[i]
+
+                    while r != qrPlus and r != qrRoot and r != None:
+                        r = self.tDict[r].parent
+
+                    if r == qrRoot:
+                        R = levelK[i]
+                        break
+
+                for i in range(0, len(levelK)):
+                    r = levelK[i]
+
+                    while r != qrPlus and r != qrRoot and r != None:
+                        r = self.tDict[r].parent
+
+                    if r == qrRoot:
+                        q = levelK[i]
+                        break
+
+
+            stPlus = self["dkMinus"][-1]
+            while stPlus is not None and self.tDict[stPlus].level != self["k"] - m - 1:
+                stPlus = self.tDict[stPlus].parent
+
+            if stPlus is not None:
+                stRoot = self.tDict[stPlus].parent
+
+                kMinusMinus   = self.lDict[self["k"] - 2]
+
+                for i in range(len(kMinusMinus) - 1, 0, -1):
+                    r = kMinusMinus[i]
+
+                    while r != stPlus and r != stRoot and r != None:
+                        r = self.tDict[r].parent
+
+                    if r == stRoot:
+                        t = kMinusMinus[i]
+                        break
+
+                for i in range(0, len(kMinusMinus)):
+                    r = kMinusMinus[i]
+
+                    while r != stPlus and r != stRoot and r != None:
+                        r = self.tDict[r].parent
+
+                    if r == stRoot:
+                        s = kMinusMinus[i]
+                        break
+
+            if q == None and R == None and s == None and t == None:
+                raise Exception("====== ALL OF S, T, Q, R, ARE NONE ======")
+
+            elif q == None or R == None or self.children(q, R) == []:
+                return self.lemma4(s, t)
+
+            elif s == None or t == None or self.children(s, t) == []:
+                return self.lemma4(q, R)
+
+            self.lVariables(d2, p)
+            d3 = self.probe(self["vl"])
+            if d3 == 0: return self.located(self["vl"])
+
+            self["dkMinus"] = self.children(self.tDict[s].parent, self.tDict[t].parent)
+            self["dk"]      = []
+            self["dkPlus"]  = self.children(self.tDict[q].parent, self.tDict[R].parent)
+
+            self["k"] = self.tDict[s].level + 1
+
+            return self.case5a(p, w, d1, d3)
+
+
+    def case5c(self, p, w, d1, zkMinus):    
+        zkMinus2 = self.tDict[zkMinus].parent
+        zk       = self.tDict[zkMinus].children[0]
+        zkMinusPred   = self["dkMinus"][self["dkMinus"].index(zkMinus) - 1]
+
+        d2 = self.probe(zk)
+
+        if d2 == 0:   return self.located(zk)
+        if d2 == 1:   return self.located(zkMinus)
+        elif d2 == 2: return self.located(zkMinus2)
+        elif d2 == 3: return self.lemma2(zkMinus2, self.tDict[zkMinus2].children[0], zkMinusPred)
+
+        elif d2 == 4:
+            zkMinus3 = self.tDict[zkMinus2].parent
+            d3 = self.probe(zkMinus3)
+            
+            if d3 == 0:
+                return self.located(zkMinus3)
+
+            if d3 == 1:
+                zkMinus3Children = self.tDict[zkMinus3].children
+                zkMinus2Pred = zkMinus3Children[zkMinus3Children.index(zkMinus2) - 1]
+
+                return self.lemma2(zkMinus3, self.tDict[zkMinus3].children[0], zkMinus2Pred)
+
+            elif d3 == 2:
+                self["dkMinus"] = self["dkMinus"][:-1]
+                return self.case5(p, w, d1, zkMinusPred)
+
+            elif d3 == 3:
+                return self.lemma4(t, zkMinusPred)
+
+            elif d3 == 4:
+                return self.lemma4(self.tDict[t].children[0], self.tDict[zkMinusPred].children[-1])
+
+        else:
+            return self.case5b(p, w, d1, d2, zkMinus)
+        
+
     def probe(self, v):
         """
          - Returns the distance from v to the target
