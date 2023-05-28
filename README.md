@@ -105,9 +105,45 @@ The Target class manages gameplay for the target player.
 #### Probe
 The Probe class manages gameplay for the probing player.
 - Initialisation
-  - moveFunc - Function governing move generation for the probing player (See Probing Strategies)
+  - moveFunc - Function or string governing move generation for the probing player (See Probing Strategies)
+- Functions
+  - move
+    - Uses the given move generation function or string to generate a move which is returned
+    - Args:
+      - tree - NetworkX representation of the tree
+      - tDict - The tDict representation of the tree
+      - lDict - the lDict representation of the tree 
+      - d - The distance returned by the previous probe
+  - simpleSeager
+    - If the moveFunc was given as a string this function is called by the move function to generate a move based on the Simplified Seager strategy
+    - Args:
+      - tree - NetworkX representation of the tree
+      - tDict - The tDict representation of the tree
+      - lDict - the lDict representation of the tree 
+      - d - The distance returned by the previous probe
+  - initial
+    - Simply probes the root of the tree
+  - updateDSets
+    - Updated the target sets based on the distance returned by the previous probe
+    - Args:
+      - tree - NetworkX representation of the tree
+      - d - The distance returned by the previous probe
 
 #### Localisation
-
+The Localisation class manages gameplay for both target and probing players as well as maintaining information throughout the game, such as the tree object, round number, winner, and capture time.
+- Initialisation
+  - tree - NetworkX representation of the tree
+  - target - Target object (See Target)
+  - probe - Probe object (See Probe)
+  - tInitial - Initial location for the target (**Optional**)
+- Functions
+  - play
+    - Begins the game and calls the initial and move functions for each player
+  - createTDict
+    - Recursively creates the tDict and lDict representations of the tree during initialisation
+    - Args:
+      - node - The current node being added to the tDict and lDict, initially node 0
+      - parent - The parent of the current node being added to the tDict and lDict, initially None
+      - level - The level of the current node being added to the tDict and lDict, initially 0
 
 ### Seager's Probing Strategy - seager.py
