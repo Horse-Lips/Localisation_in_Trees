@@ -13,3 +13,5 @@ The localisation game is a graph-based pursuit-evasion game where a hidden targe
 - This variant of the localisation game was created by Carraher et al. (https://www.sciencedirect.com/science/article/pii/S0304397512006469).
 
 ![alt text]([http://url/to/img.png](https://github.com/Horse-Lips/Localisation_in_Trees/blob/master/images/hideout.png?raw=true))
+
+<img src="images/hideout.png">
