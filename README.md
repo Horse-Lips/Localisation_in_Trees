@@ -11,3 +11,5 @@ The localisation game is a graph-based pursuit-evasion game where a hidden targe
 - The probing player wins if it is able to locate the target in a finite number of rounds
   - In practice this is similarly determined by the same threshold
 - This variant of the localisation game was created by Carraher et al. (https://www.sciencedirect.com/science/article/pii/S0304397512006469).
+
+![alt text]([http://url/to/img.png](https://github.com/Horse-Lips/Localisation_in_Trees/blob/master/images/hideout.png?raw=true))
