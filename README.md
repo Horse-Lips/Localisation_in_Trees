@@ -14,7 +14,8 @@ The localisation game is a graph-based pursuit-evasion game where a hidden targe
 - For the purposes of this implementation **All probing strategies initially probe the root of the tree** (See Target Set)
 
 ## Usage
-### Custom Tree Representation
+### Definitions
+#### Custom Tree Representation
 Within each localisation class there exist functions that represent the levels and orderings of a tree as dictionaries, referred to as the tDict (treeDict) and lDict (levelsDict). These are necessary as NetworkX does not provide explicit tree representations and views them as general graphs and because the probing strategies require the tree to be ordered in a certain way with access to the individual levels of the tree.
 - nodeInfo object
   - Each node has a nodeInfo object which maintains information about:
@@ -27,6 +28,9 @@ Within each localisation class there exist functions that represent the levels a
 - lDict - A python dictionary with:
   - A key for each level in the tree, e.g. level 0 containing just the root of the tree
   - An entry of an ordered list of nodes on that level of the tree
+
+#### Target Set
+The target set is the set of possible target locations known to the probing player. This is determined by probing the root initially and obtaining the distance d, and therefore knowing that the target could occupy any node on level d of the tree. This allows the target to be tracked while moving throughout the tree as after moving the target could occupy any node on this level, or the parents or children of nodes on this level. This allows the target set to be split into three distinct sets, one for each level of the tree that the target may occupy.
 
 ### Graph Generation - graphGenerator.py
 Usage: python graphGenerator.py n
@@ -77,9 +81,7 @@ The Simplified Seager strategy is implemented as a part of the Probe class found
 - tRight - Probe the "top right" node of the target set
 - bLeft - Probe the "bottom left" node of the target set
 - bRight - Probe the "bottom right" node of the target set
-
-#### Target Set
-The target set is the possible locations that the target may occupy after a given probe. This is determined by comparing the distance returned by a prove with each possible node the target may occupy in order to narrow down the target's location. Each probing strategy initially probes the root of the tree, and therefore the target could occupy any node on level d of the tree where d is the distance returned by the initial probe. After the target moves it could be on any node on level d, the parents of these nodes or the children of these nodes. After this initial probe the target set is updated based on future probes. Seager's strategy formalises the target set as the set R and separates it into three sets, one for each level the target may occupy at a certain point
+Top and bottom refer to the lowest and highest levels in the target set and left and right refer to nodes on the left or right of the tree as per the ordering of the tree.
 
 ### Localisation, Probe, and Target Classes (Simplified Seager) - heuristicClass.py
 The heuristicClass.py file contains several classes that manage the game for heuristic strategies such as the Simplified Seager strategy (See Probe).
