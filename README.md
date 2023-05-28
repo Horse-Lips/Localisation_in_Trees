@@ -54,3 +54,22 @@ As the game is usually analysed theoretically an optimal target with perfect kno
   - A combination of the above two strategies with a chance of remaining at the same node for consecutive rounds
 - tProbabilistic
   - The target moves to a node in the neighbourhood N where each node m in the neighbourhood is assigned the probability $\frac{deg(m)}{\sum_{n \in N}deg(n)}$
+Each of these can be given to either a Target object (See Localisation, Probe, and Target Classes) or a Seager object (See Seager's Probing Strategy).
+
+### Probing Strategies - heuristicMovement.py
+The heuristicMovement.py file also contains some simple functions for probe placement.
+- Each probing strategy is given as arguments:
+  - tree - The NetworkX tree object
+  - tDict - The tDict representation of the tree
+  - lDict - the lDict representation of the tree
+  - probeList - A list of all previous nodes probed
+  - d - The distance between the previous probe and the target
+- pRandom
+  - Probes are placed completely randomly on the tree
+- pRandomLeaf
+  - Probes are placed on completely random leaf nodes in the tree
+Each of these can be given to a Probe object (See Localisation, Probe, and Target Classes)
+
+### Localisation, Probe, and Target Classes (Simplified Seager) - heuristicClass.py
+The heuristicClass.py file contains several classes 
+### Seager's Probing Strategy - seager.py
