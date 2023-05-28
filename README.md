@@ -11,6 +11,7 @@ The localisation game is a graph-based pursuit-evasion game where a hidden targe
 - The probing player wins if it is able to locate the target in a finite number of rounds
   - In practice this is similarly determined by the same threshold
 - This variant of the localisation game was created by Carraher et al. (https://www.sciencedirect.com/science/article/pii/S0304397512006469).
+- For the purposes of this implementation **All probing strategies initially probe the root of the tree** (See Target Set)
 
 ## Usage
 ### Custom Tree Representation
@@ -57,7 +58,7 @@ As the game is usually analysed theoretically an optimal target with perfect kno
 Each of these can be given to either a Target object (See Localisation, Probe, and Target Classes) or a Seager object (See Seager's Probing Strategy).
 
 ### Probing Strategies - heuristicMovement.py
-The heuristicMovement.py file also contains some simple functions for probe placement.
+The heuristicMovement.py file also contains some simple functions for probe placement. Each probing strategy initially probes the root of the tree.
 - Each probing strategy is given as arguments:
   - tree - The NetworkX tree object
   - tDict - The tDict representation of the tree
@@ -70,6 +71,41 @@ The heuristicMovement.py file also contains some simple functions for probe plac
   - Probes are placed on completely random leaf nodes in the tree
 Each of these can be given to a Probe object (See Localisation, Probe, and Target Classes)
 
+### Probing Strategies - heuristicClass.py
+The Simplified Seager strategy is implemented as a part of the Probe class found in heuristicClass.py (See Localisation, Probe, and Target Classes). Each probing strategy initially probes the root of the tree. Instead of providing a probe movement function as above, the Probe class can be initialised with one of the four following strings:
+- tLeft - Probe the "top left" node of the target set
+- tRight - Probe the "top right" node of the target set
+- bLeft - Probe the "bottom left" node of the target set
+- bRight - Probe the "bottom right" node of the target set
+
+#### Target Set
+The target set is the possible locations that the target may occupy after a given probe. This is determined by comparing the distance returned by a prove with each possible node the target may occupy in order to narrow down the target's location. Each probing strategy initially probes the root of the tree, and therefore the target could occupy any node on level d of the tree where d is the distance returned by the initial probe. After the target moves it could be on any node on level d, the parents of these nodes or the children of these nodes. After this initial probe the target set is updated based on future probes. Seager's strategy formalises the target set as the set R and separates it into three sets, one for each level the target may occupy at a certain point
+
 ### Localisation, Probe, and Target Classes (Simplified Seager) - heuristicClass.py
-The heuristicClass.py file contains several classes 
+The heuristicClass.py file contains several classes that manage the game for heuristic strategies such as the Simplified Seager strategy (See Probe).
+
+#### Target
+The Target class manages gameplay for the target player.
+- Initialisation
+  - moveFunc - Function governing move generation for the target player (See Target Strategies)
+- Functions
+  - initial
+    - Chooses an initial node for the target (Currently random but can be predefined)
+    - Args:
+      - tree - NetworkX representation of the tree
+  - move
+    - Uses the given move generation function to generate a move which is returned
+    - Args:
+      - tree - NetworkX representation of the tree
+      - tDict - The tDict representation of the tree
+      - lDict - the lDict representation of the tree 
+
+#### Probe
+The Probe class manages gameplay for the probing player.
+- Initialisation
+  - moveFunc - Function governing move generation for the probing player (See Probing Strategies)
+
+#### Localisation
+
+
 ### Seager's Probing Strategy - seager.py
