@@ -202,3 +202,9 @@ game.play()
 ```
 
 The class will generate any future moves using the provided target move generation function.
+
+### Experiment - experiment.py
+This script is responsible for running the experiment. Usage: ```python experiment.py probeStrategy``` where probe strategy can be one of the four strings given in Probe Strategies section or ```"Seager"``` for Seager's strategy. The script will iterate over each graph in the treeFiles folder and begin a game with each node of the graph as a starting point for the target, each node will be used as a starting point 25 times a total of 3 times, 25 times per target strategy. The average capture and run times of these 25 executions being reported as the capture time when starting at that node. The script will output a results file containing these averaged times for each node as ```"experimentResults.txt"``` prefixed with the given probe strategy string.
+
+### Plotting Results - plotResults.py
+This script will iterate over a given results file and average the capture times of each graph before producing a matplotlib (https://matplotlib.org/) graph of average capture time compared with number of nodes in the graph. Usage: ```python plotResults resultsFile``` where ```resultsFile``` is an output of running the experiment script.
