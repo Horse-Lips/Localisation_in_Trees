@@ -406,7 +406,7 @@ class Seager:
 
         if   d2 == 0:      return self.located(zkMinus2)
         elif d2 == 1:      return self.located(zkMinus)
-        elif d2 == 2:      return self.lemma4(zkMinus, zkMinus)
+        elif d2 == 2:      return self.lemma2(zkMinus, zkMinus)
         elif d2 == d1:     return self.lemma4(self["dkMinus"][0], self["dkMinus"][-1])
         elif d2 == d1 - 1: return self.lemma4(wk, xk)
 
