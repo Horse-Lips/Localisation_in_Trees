@@ -1,4 +1,4 @@
-# Search Approaches to the Localisation Game
+# A Practical View of the Localisation Game
 The localisation game is a graph-based pursuit-evasion game where a hidden target moves between the nodes of a graph and a probing player attempts to detemrine its location using distance queries. The primary focus of this project is to assess Suzanne Seager's strategy for rooted trees (https://www.sciencedirect.com/science/article/pii/S0304397512006469). All code is implemented in Python and graphs use the NetworkX library (https://networkx.org/) with a custom representation of trees.
 
 ## Game Rules
