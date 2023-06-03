@@ -6,7 +6,7 @@ from   numpy.random import uniform
 import time, os
 
 
-class nodeInfo:
+class NodeInfo:
     """
      - Stores information about nodes in a tree.
      - Variables:
@@ -31,7 +31,7 @@ class Localisation:
         - captTime - Rounds taken to locate target
         - tInitial - Target start location (optional)
     """
-    def __init__(self, tree = None, tMoveFunc = None, pMoveFunc = None, tMoveList = [], pMoveList = []):
+    def __init__(self, tree, tMoveFunc, pMoveFunc, tMoveList = [], pMoveList = []):
         self.tree      = tree
         
         self.tMoveFunc = tMoveFunc
@@ -132,7 +132,7 @@ class Seager:
             - t, tLocation          - List of target locations, final target location. t can be preset as node list
             - l, vl, yl, zl         - Level l in the tree and associated nodes (case 5)
     """
-    def __init__(self, tree = None, tMoveFunc = None, tMoveList = []):
+    def __init__(self, tree, tMoveFunc, tMoveList = []):
         self.tree      = tree   #NetworkX tree object (Rooted at node 0)
         self.captTime  = 0
         self.win       = "Target"
@@ -834,7 +834,7 @@ class Utils:
         if node  not in lDict[level]: lDict[level].append(node)
 
         nodeChildren = [i for i in tree.neighbors(node) if i not in tDict]
-        tDict[node]  = nodeInfo(level, parent, nodeChildren)
+        tDict[node]  = NodeInfo(level, parent, nodeChildren)
 
         for child in nodeChildren: Utils.createTDict(child, tDict, lDict, tree, parent = node, level = level + 1)
 
