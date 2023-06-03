@@ -1,9 +1,13 @@
 import networkx as nx
-from random import choice
+from   natsort  import natsorted
+from   random   import choice
+import time, os
+
 
 #===Global Variables===#
 U = []
 L = []
+#======================#
 
 
 class nodeInfo:
@@ -31,7 +35,7 @@ class Localisation:
         - captTime - Rounds taken to locate target
         - tInitial - Target start location (optional)
     """
-    def __init__(self, tree, tMoveFunc, pMoveFunc, tMoveList = [], pMoveList = []):
+    def __init__(self, tree = None, tMoveFunc = None, pMoveFunc = None, tMoveList = [], pMoveList = []):
         self.tree      = tree
         
         self.tMoveFunc = tMoveFunc
@@ -46,16 +50,31 @@ class Localisation:
         self.tDict = dict()
         self.lDict = dict()
 
-        Utils.createTDict("0", self.tDict, self.lDict, self.tree)   #Create tDict rooted at node 0
+        if tree is not None:
+            Utils.createTDict("0", self.tDict, self.lDict, self.tree)   #Create tDict rooted at node 0
 
+            self.tDict["leaves"] = []
+            for i in self.tDict:
+                if i == "leaves":
+                    continue
+
+                if self.tDict[i].children == []:
+                    self.tDict["leaves"].append(i)
+
+
+    def setTree(self, tree):
+        self.tree = tree
+        
+        Utils.createTDict("0", self.tDict, self.lDict, self.tree)   #Create tDict rooted at node 0
         self.tDict["leaves"] = []
+        
         for i in self.tDict:
             if i == "leaves":
                 continue
 
             if self.tDict[i].children == []:
                 self.tDict["leaves"].append(i)
-
+                    
 
     def play(self):
         """
@@ -71,6 +90,8 @@ class Localisation:
             tDist     = nx.shortest_path_length(self.tree, pMove, tMove)        #Dist from p to t
             tPossible = [i for i in dists if dists[i] == tDist]                 #Possible t locations
             
+            self.pMoveList.append(pMove)
+            
             if tMove == pMove:
                 self.win = "Probe"
                 break
@@ -84,10 +105,17 @@ class Localisation:
                 break
             
             tMove = self.tMoveFunc(self.tree, self.tDict, self.lDict, tMove)
-            pMove = self.pMoveFunc(self.tree, self.tDict, self.lDict, self.moveList, d)
+            pMove = self.pMoveFunc(self.tree, self.tDict, self.lDict, self.pMoveList, d)
             self.captTime += 1
         
         return self.captTime
+    
+    
+    def reset(self):
+        self.tMoveList = [self.tMoveList[0]]
+        self.pMoveList = []
+        self.win = None
+        self.captTime = 1
 
 
 class Seager:
@@ -108,19 +136,20 @@ class Seager:
             - t, tLocation          - List of target locations, final target location. t can be preset as node list
             - l, vl, yl, zl         - Level l in the tree and associated nodes (case 5)
     """
-    def __init__(self, tree, tMoveFunc):
-        self.tree     = tree   #NetworkX tree object (Rooted at node 0)
-        self.captTime = 0
-        self.win      = "Target"
-        self.tDict    = dict() #Dict representation of tree object (See createTreeDict)  
-        self.lDict    = dict() #Dict of level information of the tree object
-        self.iDict    = dict() #Dict containing relevant information during execution
+    def __init__(self, tree = None, tMoveFunc = None, tMoveList = []):
+        self.tree      = tree   #NetworkX tree object (Rooted at node 0)
+        self.captTime  = 0
+        self.win       = "Target"
+        self.tDict     = dict() #Dict representation of tree object (See createTreeDict)  
+        self.lDict     = dict() #Dict of level information of the tree object
+        self.iDict     = dict() #Dict containing relevant information during execution
         
         self.tMoveFunc = tMoveFunc  #Function controlling target movement
+        self.tMoveList = tMoveList
         
-        Utils.createTDict("0", self.tDict, self.lDict, self.tree)
-
-
+        if tree is not None: Utils.createTDict("0", self.tDict, self.lDict, self.tree)
+        
+        
     def __setitem__(self, key, value):
         self.iDict[key] = value
 
@@ -128,6 +157,11 @@ class Seager:
     def __getitem__(self, key):
         try:    return self.iDict[key]
         except: return None
+    
+    
+    def setTree(self, tree):
+        self.tree = tree
+        Utils.createTDict("0", self.tDict, self.lDict, self.tree)
 
 
     def play(self):
@@ -667,14 +701,14 @@ class Seager:
         """
          - Returns the distance from v to the target
         """
-        if self.captTime == 0: self["probeList"] = []                       #Initialise probe list
-        if self["t"] is None:  self["t"] = [choice(list(self.tree.nodes))]  #Random target start if none given
+        if self.captTime == 0:      self["probeList"] = []                            #Initialise probe list
+        if self.tMoveList is None:  self.tMoveList = [choice(list(self.tree.nodes))]  #Random target start if none given
 
         self["probeList"].append(v) #Add probed node to probe list
         self.captTime += 1          #Increase capture time by one
                     
-        d  = nx.shortest_path_length(self.tree, v, self["t"][-1])               #Get dist from node to target
-        self["t"].append(self.tMoveFunc(self.tree, self.tDict, self.lDict, self["t"][-1]))  #Move target according to given movement function
+        d  = nx.shortest_path_length(self.tree, v, self.tMoveList[-1])                                #Get dist from node to target
+        self.tMoveList.append(self.tMoveFunc(self.tree, self.tDict, self.lDict, self.tMoveList[-1]))  #Move target according to given movement function
 
         return d
 
@@ -778,6 +812,13 @@ class Seager:
         while self.tDict[levelK[zIndex]].children == []: zIndex -= 1
 
         return levelK[wIndex], levelK[zIndex]
+
+
+    def reset(self):
+        self.captTime = 0
+        self.win = "Target"
+        self.iDict     = dict()
+        self.tMoveList = [self.tMoveList[0]]
 
 
 class Utils:
@@ -988,3 +1029,58 @@ class ProbeMovement:
             probeList.append("0")
         
         return probeList[-1]
+
+
+class Experiment:
+    def experiment(game, treeDIR, outFileName = "experiment.txt"):
+        tStrats = [ #Each target movement strategy
+            TargetMovement.tRandom,
+            TargetMovement.tProbabilistic,
+            TargetMovement.tUpDown
+        ]
+        
+        resFile = open(outFileName, 'w')
+
+        for tStrat in tStrats:  #Iterate target strats
+            resFile.write("Target strat:" + str(tStrat) + "\n")
+            print("Target strat:", tStrat)
+            game.tMoveFunc = tStrat
+            
+            for graphName in natsorted(os.listdir(treeDIR)):    #Iterate over tree files
+                resFile.write("Graph" + graphName + "\n")
+                print("Current tree: ", graphName)
+                
+                tree = nx.read_adjlist(treeDIR + "\\" + graphName)    #Load tree file as nx graph
+                game.setTree(tree)
+                
+                nodeAvgs  = []
+                nodeTimes = []
+                
+                for startNode in range(len(tree)):      #Use each node as a starting position
+                    currNodeAvg  = 0
+                    currNodeTime = 0
+                    
+                    for i in range(25):                 #Start from each node 100 times for a mean
+                        result = None
+                        
+                        while result is None:
+                            game.tMoveList = [str(startNode)]
+
+                            try:
+                                start  = time.time()
+                                result = game.play()
+                                
+                                currNodeAvg  += game.captTime
+                                currNodeTime += time.time() - start
+                                
+                            except:
+                                game.reset()
+                                pass
+                                
+                    nodeAvgs.append( currNodeAvg  / 25)
+                    nodeTimes.append(currNodeTime / 25)
+                
+                resFile.write("Capture Times: " + str(nodeAvgs) + "\n")
+                resFile.write("Run Times: " + str(nodeTimes) + "\n")
+            
+        resFile.close()
