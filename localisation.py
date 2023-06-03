@@ -39,7 +39,7 @@ class Localisation:
         self.tDict = dict()
         self.lDict = dict()
 
-        self.createTDict("0")   #Create tDict rooted at node 0
+        createTDict("0", self.tDict, self.lDict, self.tree)   #Create tDict rooted at node 0
 
         self.tDict["leaves"] = []
         for i in self.tDict:
@@ -81,30 +81,6 @@ class Localisation:
             self.captTime += 1
         
         return self.captTime
-
-
-    def createTDict(self, node, parent = None, level = 0):
-        """
-         - Converts a tree to a dictionary, where keys are the
-         - the node's ID and values are nodeInfo entries as above.
-         - Args:
-            - d      - A dictionary.
-            - tree   - A networkx tree.
-            - node   - Node to add to the dictionary.
-            - parent - The node's parent if it exists.
-            - level  - The level in the tree that the node is on.
-        """
-        if level not in self.lDict:
-            self.lDict[level] = []
-
-        if node not in self.lDict[level]:
-            self.lDict[level].append(node)
-
-        nodeChildren = [i for i in self.tree.neighbors(node) if i not in self.tDict]
-        self.tDict[node] = nodeInfo(level, parent, nodeChildren)
-
-        for child in nodeChildren:
-            self.createTDict(child, parent = node, level = level + 1)
 
 
 class Probe:
@@ -159,6 +135,7 @@ class Probe:
             self.moveList.append("0")
     
         return self.moveList[-1]
+
 
     def initial(self):
         self.moveList.append("0")
@@ -241,7 +218,7 @@ class Seager:
         
         self.tMoveFunc = tMoveFunc  #Function controlling target movement
         
-        self.createTDict("0")
+        createTDict("0", self.tDict, self.lDict, self.tree)
 
 
     def __setitem__(self, key, value):
@@ -620,9 +597,9 @@ class Seager:
                     t = kMinus[i]
                     break
 
-            return self.lemma4(self.tDict[wk].parent, t, self.tDict[wk].level + 1)"""
+            return self.lemma4(self.tDict[wk].parent, t, self.tDict[wk].level + 1)
 
-        #return self.case5bExtraCase(zkMinus2, w, d1, d2)
+        return self.case5bExtraCase(zkMinus2, w, d1, d2)"""
 
 
     def case5bExtraCase(self, p, w, d1, d2):
@@ -839,27 +816,7 @@ class Seager:
             for c in self.tDict[n].children:
                 if c not in self["dkPlus"]:
                     self["dkPlus"].append(c)
-
-
-    def createTDict(self, node, parent = None, level = 0):
-        """
-         - Converts a tree to a dictionary, where keys are the
-         - the node's ID and values are nodeInfo entries as above.
-         - Args:
-            - d      - A dictionary.
-            - tree   - A networkx tree.
-            - node   - Node to add to the dictionary.
-            - parent - The node's parent if it exists.
-            - level  - The level in the tree that the node is on.
-        """
-        if level not in self.lDict:        self.lDict[level] = []
-        if node  not in self.lDict[level]: self.lDict[level].append(node)
-
-        nodeChildren     = [i for i in self.tree.neighbors(node) if i not in self.tDict]
-        self.tDict[node] = nodeInfo(level, parent, nodeChildren)
-
-        for child in nodeChildren: self.createTDict(child, parent = node, level = level + 1)
-
+            
 
     def located(self, v):
         """
@@ -921,3 +878,24 @@ class Seager:
         while self.tDict[levelK[zIndex]].children == []: zIndex -= 1
 
         return levelK[wIndex], levelK[zIndex]
+
+
+"""Utility functions for use with various classes."""
+def createTDict(node, tDict, lDict, tree, parent = None, level = 0):
+    """
+     - Converts a tree to a dictionary, where keys are the
+     - the node's ID and values are nodeInfo entries as above.
+     - Args:
+        - d      - A dictionary.
+        - tree   - A networkx tree.
+        - node   - Node to add to the dictionary.
+        - parent - The node's parent if it exists.
+        - level  - The level in the tree that the node is on.
+    """
+    if level not in lDict:        lDict[level] = []
+    if node  not in lDict[level]: lDict[level].append(node)
+
+    nodeChildren = [i for i in tree.neighbors(node) if i not in tDict]
+    tDict[node]  = nodeInfo(level, parent, nodeChildren)
+
+    for child in nodeChildren: createTDict(child, tDict, lDict, tree, parent = node, level = level + 1)
