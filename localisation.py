@@ -31,14 +31,17 @@ class Localisation:
         - captTime - Rounds taken to locate target
         - tInitial - Target start location (optional)
     """
-    def __init__(self, tree, target, probe, tInitial = None):
-        self.tree     = tree
-        self.target   = target
-        self.probe    = probe
-        self.win      = None
-        self.captTime = 1       #Start at 1 for initial moves
-
-        self.tInitial = tInitial
+    def __init__(self, tree, tMoveFunc, pMoveFunc, tMoveList = [], pMoveList = []):
+        self.tree      = tree
+        
+        self.tMoveFunc = tMoveFunc
+        self.tMoveList = []
+        
+        self.pMoveFunc = pMoveFunc
+        self.pMoveList = []
+        
+        self.win       = None
+        self.captTime  = 1       #Start at 1 for initial moves
         
         self.tDict = dict()
         self.lDict = dict()
@@ -59,9 +62,9 @@ class Localisation:
          - Calls the target's initial() function for initial placement, then alternates
          - the play() function for probe and target until there is a winner.
         """
-        if self.tInitial is None: tMove = self.target.initial(self.tree)      #Initial target placement
-        else:                     tMove = self.tInitial
-        pMove = self.probe.initial()                #Initial probe move (Usually root)
+        if self.tMoveList == []: tMove = choice(list(self.tree.nodes))      #Initial target placement
+        else:                    tMove = self.tMoveList[0]
+        pMove = "0"              #Initial probe move (Usually root)
         
         while True:
             dists     = nx.single_source_dijkstra_path_length(self.tree, pMove) #Dist from p to all nodes
@@ -80,78 +83,11 @@ class Localisation:
                 self.win = "Target"
                 break
             
-            tMove = self.target.move(self.tree, self.tDict, self.lDict)
-            pMove = self.probe.move(self.tree, self.tDict, self.lDict, tDist)
+            tMove = self.tMoveFunc(self.tree, self.tDict, self.lDict, tMove)
+            pMove = self.pMoveFunc(self.tree, self.tDict, self.lDict, self.moveList, d)
             self.captTime += 1
         
         return self.captTime
-
-
-class Probe:
-    """
-     - Probe player class, given a move function this can
-     - be called by the controller class to play the game
-    """
-    def __init__(self, moveFunc):
-        self.moveFunc = moveFunc
-        self.moveList = []
-
-
-    def move(self, tree, tDict, lDict, d):
-        return self.moveFunc(tree, tDict, lDict, self.moveList, d)
-
-
-    def initial(self):
-        self.moveList.append("0")
-        return "0"  #Just probe the root at the start of the game
-
-
-    def updateDSets(self, tree, d):
-        """
-         - Updates the sets Dk-1, Dk, Dk+1
-        """
-        distances = nx.single_source_dijkstra_path_length(tree, self.moveList[-1])
-        dkMinus, dk, dkPlus = [], [], []
-
-        tSet = self.dkMinus + self.dk + self.dkPlus
-
-        for i in distances:
-            if distances[i] == d:
-                if   i in dkMinus: dkMinus.append(i)
-                elif i in dk:      dk.append(i)
-                elif i in dkPlus:  dkPlus.append(i)
-
-        self.dkMinus, self.dk, self.dkPlus = dkMinus, dk, dkPlus
-
-
-class Target:
-    """
-     - Target player class, given an initial placement
-     - function and a move function, these can be called
-     - by the controller class to play the game
-     - Variables:
-        - initialFunc - Function that chooses an initial node for the target
-        - moveFunc    - Function that chooses a move for the target
-        - moveList    - List of all moves made by the target
-    """
-    def __init__(self, initialFunc, moveFunc):
-        self.initialFunc = initialFunc
-        self.moveFunc    = moveFunc
-        self.moveList    = []
-
-
-    def initial(self, tree):
-        move = choice(list(tree.nodes))
-        self.moveList.append(move)
-
-        return move
-
-
-    def move(self, tree, tDict, lDict):
-        move = self.moveFunc(tree, tDict, lDict, self.moveList[-1])
-        self.moveList.append(move)
-
-        return move
 
 
 class Seager:
@@ -844,8 +780,8 @@ class Seager:
         return levelK[wIndex], levelK[zIndex]
 
 
-"""Utility functions for use with various classes."""
 class Utils:
+    """Utility functions for use with various classes."""
     def createTDict(node, tDict, lDict, tree, parent = None, level = 0):
         """
          - Converts a tree to a dictionary, where keys are the

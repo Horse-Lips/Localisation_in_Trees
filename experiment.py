@@ -34,11 +34,7 @@ for tStrat in tStrats:  #Iterate target strats
                         game["t"] = [str(startNode)]
                         
                     else:
-                        pPlayer = Probe(pStrats[sys.argv[1]])
-                        tPlayer = Target(None, tStrat)
-                        tPlayer.moveList.append(str(startNode))
-                        game = Localisation(tree, tPlayer, pPlayer, tInitial = str(startNode))
-
+                        game = Localisation(tree, tStrat, pStrats[sys.argv[1]], tMoveList = [str(startNode)])
 
                     try:
                         start  = time.time()
