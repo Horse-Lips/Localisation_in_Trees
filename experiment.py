@@ -1,6 +1,5 @@
-from   seager            import Seager
-from   heuristicMovement import *
-from   heuristicClass    import *
+from   localisation      import *
+from   movementFunctions import *
 import networkx          as     nx
 import time, sys
 
