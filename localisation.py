@@ -802,6 +802,42 @@ class Utils:
         for child in nodeChildren: Utils.createTDict(child, tDict, lDict, tree, parent = node, level = level + 1)
 
 
+    def _detectHideouts(tDict):
+        """
+         - Detects hideouts in a tree defined as a node with at least
+         - 3 neighbours each of which have at least 3 neighbours.
+         - Variables:
+            - tDict - tDict representation of the tree (See genTreeDicts)
+        """
+        for node in tDict:        
+            children = tDict[node].children     #Get node's children
+            parent   = tDict[node].parent       #Get node's parent
+            
+            if   parent is not None and len(children) < 2: continue   #Node must have degree >= 3 to be a hideout
+            elif parent is     None and len(children) < 3: continue
+
+            childDegs = [(len(tDict[child].children) + 1) for child in children]     #Degrees of node's children
+            parentDeg = 0
+            if parent is not None: parentDeg = len(tDict[parent].children) + 1 if tDict[parent].parent is not None else 0    #Work out degree of parent node
+            
+            deg3Count = sum(deg >= 3 for deg in childDegs) + 1 if parentDeg >= 3 else 0   #Number of neighbours with degree 3
+            
+            if deg3Count >= 3: return 0 #Return -1 if more than 2
+
+        return 1
+
+
+    def generateRandomGraph(numNodes):
+        tDict = dict()
+        lDict = dict()
+
+        tree = nx.random_tree(numNodes)
+        Utils.createTDict(0, tDict, lDict, tree)
+
+        if not Utils._detectHideouts(tDict): print("Hideout detected")
+        else:                                nx.write_adjlist(tree, "randomTree" + str(numNodes) + ".txt")
+
+
 class TargetMovement:
     def tRandom(tree, tDict, lDict, node):
         """
