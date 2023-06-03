@@ -1,13 +1,9 @@
 import networkx as nx
 from   natsort  import natsorted
 from   random   import choice
+from   numpy    import cumsum
+from   numpy.random import uniform
 import time, os
-
-
-#===Global Variables===#
-U = []
-L = []
-#======================#
 
 
 class nodeInfo:
@@ -105,7 +101,7 @@ class Localisation:
                 break
             
             tMove = self.tMoveFunc(self.tree, self.tDict, self.lDict, tMove)
-            pMove = self.pMoveFunc(self.tree, self.tDict, self.lDict, self.pMoveList, d)
+            pMove = self.pMoveFunc(self.tree, self.tDict, self.lDict, self.pMoveList, tDist)
             self.captTime += 1
         
         return self.captTime
@@ -947,7 +943,15 @@ class TargetMovement:
             if n <= nDegrees[i]:
                 return neighbours[i]
                 
-                
+
+#===Global Variables===#
+global U
+global L
+
+U = []
+L = []
+#======================#
+
 class ProbeMovement:
     def pRandom(tree, tDict, lDict, probeList, d):
         """
@@ -964,14 +968,26 @@ class ProbeMovement:
 
 
     def pTLeft(tree, tDict, lDict, probeList, d):
+        global U
+        global L
+        
         if len(probeList) % 3 == 1:
-            try:    U = lDict[d - 1]
-            except: U = lDict[d]
+            try:
+                U = lDict[d - 1]
+                
+            except:
+                if d > max(lDict): U = tDict["leaves"]
+                else:              U = lDict[d]
 
             probeList.append(U[0])
 
         elif len(probeList) % 3 == 2:
-            try:    probeList.append(tDict[U[0]].parent)
+            try:
+                node = tDict[U[0]].parent
+                
+                if node is not None: probeList.append(node)
+                else:                probeList.append(U[0])
+                
             except: probeList.append(U[0])
             
         else:
@@ -981,14 +997,26 @@ class ProbeMovement:
 
 
     def pTRight(tree, tDict, lDict, probeList, d):
+        global U
+        global L
+        
         if len(probeList) % 3 == 1:
-            try:    U = lDict[d - 1]
-            except: U = lDict[d]
+            try:
+                U = lDict[d - 1]
+                
+            except:
+                if d > max(lDict): U = tDict["leaves"]
+                else:              U = lDict[d]
 
             probeList.append(U[-1])
 
         elif len(probeList) % 3 == 2:
-            try:    probeList.append(tDict[U[-1]].parent)
+            try:
+                node = tDict[U[-1]].parent
+                
+                if node is not None: probeList.append(node)
+                else:                probeList.append(U[-1])
+                
             except: probeList.append(U[-1])
             
         else:
@@ -998,9 +1026,16 @@ class ProbeMovement:
 
 
     def pBLeft(tree, tDict, lDict, probeList, d):
+        global U
+        global L
+        
         if len(probeList) % 3 == 1:
-            try:    U = lDict[d + 1]
-            except: U = lDict[d]
+            try:
+                U = lDict[d + 1]
+                
+            except:
+                if d > max(lDict): U = tDict["leaves"]
+                else:              U = lDict[d]
 
             probeList.append(U[0])
 
@@ -1015,9 +1050,16 @@ class ProbeMovement:
 
 
     def pBRight(tree, tDict, lDict, probeList, d):
+        global U
+        global L
+        
         if len(probeList) % 3 == 1:
-            try:    U = lDict[d + 1]
-            except: U = lDict[d]
+            try:
+                U = lDict[d + 1]
+                
+            except:
+                if d > max(lDict): U = tDict["leaves"]
+                else:              U = lDict[d]
 
             probeList.append(U[-1])
 
