@@ -29,7 +29,7 @@ for tStrat in tStrats:  #Iterate target strats
                 result = None
                 
                 while result is None:
-                    if sys.argv[1] == "Seager":
+                    if sys.argv[1] == "seager":
                         game = Seager(tree, tStrat)
                         game["t"] = [str(startNode)]
                         

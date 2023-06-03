@@ -43,7 +43,7 @@ class Localisation:
         self.tDict = dict()
         self.lDict = dict()
 
-        createTDict("0", self.tDict, self.lDict, self.tree)   #Create tDict rooted at node 0
+        Utils.createTDict("0", self.tDict, self.lDict, self.tree)   #Create tDict rooted at node 0
 
         self.tDict["leaves"] = []
         for i in self.tDict:
@@ -182,7 +182,7 @@ class Seager:
         
         self.tMoveFunc = tMoveFunc  #Function controlling target movement
         
-        createTDict("0", self.tDict, self.lDict, self.tree)
+        Utils.createTDict("0", self.tDict, self.lDict, self.tree)
 
 
     def __setitem__(self, key, value):
@@ -845,24 +845,25 @@ class Seager:
 
 
 """Utility functions for use with various classes."""
-def createTDict(node, tDict, lDict, tree, parent = None, level = 0):
-    """
-     - Converts a tree to a dictionary, where keys are the
-     - the node's ID and values are nodeInfo entries as above.
-     - Args:
-        - d      - A dictionary.
-        - tree   - A networkx tree.
-        - node   - Node to add to the dictionary.
-        - parent - The node's parent if it exists.
-        - level  - The level in the tree that the node is on.
-    """
-    if level not in lDict:        lDict[level] = []
-    if node  not in lDict[level]: lDict[level].append(node)
+class Utils:
+    def createTDict(node, tDict, lDict, tree, parent = None, level = 0):
+        """
+         - Converts a tree to a dictionary, where keys are the
+         - the node's ID and values are nodeInfo entries as above.
+         - Args:
+            - d      - A dictionary.
+            - tree   - A networkx tree.
+            - node   - Node to add to the dictionary.
+            - parent - The node's parent if it exists.
+            - level  - The level in the tree that the node is on.
+        """
+        if level not in lDict:        lDict[level] = []
+        if node  not in lDict[level]: lDict[level].append(node)
 
-    nodeChildren = [i for i in tree.neighbors(node) if i not in tDict]
-    tDict[node]  = nodeInfo(level, parent, nodeChildren)
+        nodeChildren = [i for i in tree.neighbors(node) if i not in tDict]
+        tDict[node]  = nodeInfo(level, parent, nodeChildren)
 
-    for child in nodeChildren: createTDict(child, tDict, lDict, tree, parent = node, level = level + 1)
+        for child in nodeChildren: Utils.createTDict(child, tDict, lDict, tree, parent = node, level = level + 1)
 
 
 class TargetMovement:
