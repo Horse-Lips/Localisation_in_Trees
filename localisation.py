@@ -1,6 +1,10 @@
 import networkx as nx
 from random import choice
 
+#===Global Variables===#
+U = []
+L = []
+
 
 class nodeInfo:
     """
@@ -91,50 +95,10 @@ class Probe:
     def __init__(self, moveFunc):
         self.moveFunc = moveFunc
         self.moveList = []
-        
-        self.dkMinus = []
-        self.dk      = []
-        self.dkPlus  = []
 
 
     def move(self, tree, tDict, lDict, d):
-        if type(self.moveFunc) == str: return self.simpleSeager(tree, tDict, lDict, d)
-        else:                          return self.moveFunc(tree, tDict, lDict, self.moveList, d)
-
-
-    def simpleSeager(self, tree, tDict, lDict, d):
-        if len(self.moveList) % 2 == 0:
-            self.updateDSets(tree, d)
-            parentSet = []
-            
-            if   self.dkPlus  != []: parentSet = self.dkPlus
-            elif self.dk      != []: parentSet = self.dk
-            elif self.dkMinus != []: parentSet = self.dkMinus
-            
-            if parentSet == []:             self.moveList.append("0")
-            elif self.moveFunc == "tLeft":  self.moveList.append(tDict[parentSet[0]].parent)
-            elif self.moveFunc == "tRight": self.moveList.append(tDict[parentSet[-1]].parent)
-            elif self.moveFunc == "bLeft":  self.moveList.append(tDict[parentSet[0]].children[0])
-            elif self.moveFunc == "bRight": self.moveList.append(tDict[parentSet[0]].children[-1])
-            
-        elif len(self.moveList) % 1 == 0:
-            try:    self.dkMinus = lDict[d - 1]
-            except: self.dkMinus = lDict[d]
-            
-            self.dk      = lDict[d]   #Dk is level d after probing the root
-            
-            try:    self.dkPlus = lDict[d + 1]
-            except: self.dkPlus = lDict[d]
-
-            if self.moveFunc == "tLeft":    self.moveList.append(self.dkMinus[0])
-            elif self.moveFunc == "tRight": self.moveList.append(self.dkMinus[-1])
-            elif self.moveFunc == "bLeft":  self.moveList.append(self.dkPlus[0])
-            elif self.moveFunc == "bRight": self.moveList.append(self.dkPlus[-1])
-        
-        else:
-            self.moveList.append("0")
-    
-        return self.moveList[-1]
+        return self.moveFunc(tree, tDict, lDict, self.moveList, d)
 
 
     def initial(self):
@@ -899,3 +863,155 @@ def createTDict(node, tDict, lDict, tree, parent = None, level = 0):
     tDict[node]  = nodeInfo(level, parent, nodeChildren)
 
     for child in nodeChildren: createTDict(child, tDict, lDict, tree, parent = node, level = level + 1)
+
+
+class TargetMovement:
+    def tRandom(tree, tDict, lDict, node):
+        """
+         - Given the node that the target currently
+         - occupies, move to a random neighbour node.
+        """
+        return choice([i for i in tree.neighbors(node)])
+
+
+    def tUpTree(tree, tDict, lDict, node):
+        """
+         - Given the tDict and node the target
+         - occupies, move up the tree with a 70% 
+         - chance, move down the tree with a 20%
+         - chance, stay still with a 10% chance
+        """
+        n = uniform(0, 1)
+
+        if   n <= 0.7 and tDict[node].parent is not None: return tDict[node].parent
+        elif n <= 0.9 and tDict[node].children != []:     return choice(tDict[node].children)
+        else:                                             return node
+
+
+    def tDownTree(tree, tDict, lDict, node):
+        """
+         - The same as upTree but with higher
+         - probability of moving down the tree
+        """
+        n = uniform(0, 1)
+
+        if   n <= 0.7 and tDict[node].children != []:     return choice(tDict[node].children)
+        elif n <= 0.9 and tDict[node].parent is not None: return tDict[node].parent
+        else:                                             return node
+
+
+    def tUpDown(tree, tDict, lDict, node):
+        """
+         - Given the currently occupied node, 35%
+         - chance of selecting the parent 50% chance
+         - of selecting a random child, and 15%
+         - chance of remaining at the node itself.
+        """
+        n = uniform(0, 1)
+        
+        if   n <= 0.35  and tDict[node].parent is not None: return tDict[node].parent
+        elif n <= .85 and tDict[node].children != []:       return choice(tDict[node].children)
+        else:                                               return node
+
+
+    def tProbabilistic(tree, tDict, lDict, node):
+        """
+         - Probabilistic movement where the prob-
+         - ability of moving to a neighbour is
+         - equal to its degree divided by the sum
+         - of the degree of all neighbours of the
+         - node currently occupied by the target.
+        """
+        neighbours = [i for i in tree.neighbors(node)]
+        nDegrees   = [len([i for i in tree.neighbors(neighb)]) for neighb in neighbours]
+        nSum       = sum(nDegrees)
+        nDegrees   = cumsum([i / nSum for i in nDegrees])
+
+        n = uniform(0, 1)
+
+        for i in range(len(neighbours)):
+            if n <= nDegrees[i]:
+                return neighbours[i]
+                
+                
+class ProbeMovement:
+    def pRandom(tree, tDict, lDict, probeList, d):
+        """
+         - Probe a random node in the tree
+        """
+        return choice(list(tree.nodes))
+
+
+    def pRandomLeaf(tree, tDict, lDict, probeList, d):
+        """
+         - Probe a random leaf node of the tree
+        """
+        return choice(tDict["leaves"])
+
+
+    def pTLeft(tree, tDict, lDict, probeList, d):
+        if len(probeList) % 3 == 1:
+            try:    U = lDict[d - 1]
+            except: U = lDict[d]
+
+            probeList.append(U[0])
+
+        elif len(probeList) % 3 == 2:
+            try:    probeList.append(tDict[U[0]].parent)
+            except: probeList.append(U[0])
+            
+        else:
+            probeList.append("0")
+        
+        return probeList[-1]
+
+
+    def pTRight(tree, tDict, lDict, probeList, d):
+        if len(probeList) % 3 == 1:
+            try:    U = lDict[d - 1]
+            except: U = lDict[d]
+
+            probeList.append(U[-1])
+
+        elif len(probeList) % 3 == 2:
+            try:    probeList.append(tDict[U[-1]].parent)
+            except: probeList.append(U[-1])
+            
+        else:
+            probeList.append("0")
+        
+        return probeList[-1]
+
+
+    def pBLeft(tree, tDict, lDict, probeList, d):
+        if len(probeList) % 3 == 1:
+            try:    U = lDict[d + 1]
+            except: U = lDict[d]
+
+            probeList.append(U[0])
+
+        elif len(probeList) % 3 == 2:
+            try:    probeList.append(tDict[U[0]].children[0])
+            except: probeList.append(U[0])
+            
+        else:
+            probeList.append("0")
+        
+        return probeList[-1]
+
+
+    def pBRight(tree, tDict, lDict, probeList, d):
+        if len(probeList) % 3 == 1:
+            try:    U = lDict[d + 1]
+            except: U = lDict[d]
+
+            probeList.append(U[-1])
+
+        elif len(probeList) % 3 == 2:
+            try:    probeList.append(tDict[U[-1]].children[-1])
+            except: probeList.append(U[-1])
+            
+        else:
+            probeList.append("0")
+        
+        return probeList[-1]

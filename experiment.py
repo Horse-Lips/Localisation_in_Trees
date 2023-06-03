@@ -1,16 +1,16 @@
-from   localisation      import *
-from   movementFunctions import *
-import networkx          as     nx
+from   localisation import *
+import networkx     as     nx
 import time, sys
 
 
-tStrats = ["Random", "Prob",   "UpDown"]                    #Each target strategy
+tStrats = [TargetMovement.tRandom, TargetMovement.tProbabilistic, TargetMovement.tUpDown]   #Each target strategy
+pStrats = {"tLeft":  ProbeMovement.pTLeft, "tRight": ProbeMovement.pTRight, "bLeft":  ProbeMovement.pBLeft, "bRight": ProbeMovement.pBRight}
 resFile = open(sys.argv[1] + "experimentResults.txt", 'w')
 resFile.write(sys.argv[1] + "\n")
 print("Probe strat:", sys.argv[1])
 
 for tStrat in tStrats:  #Iterate target strats
-    resFile.write(tStrat + "\n")
+    resFile.write(str(tStrat) + "\n")
     print("Target strat:", tStrat)
     
     for graphNum in range(3, 151):    #Iterate over tree files
@@ -30,21 +30,13 @@ for tStrat in tStrats:  #Iterate target strats
                 
                 while result is None:
                     if sys.argv[1] == "Seager":
-                        if   tStrat == "Random": game = Seager(tree, tRandom)
-                        elif tStrat == "Prob":   game = Seager(tree, tProbabilistic)
-                        elif tStrat == "UpDown": game = Seager(tree, tUpDown)
-                            
+                        game = Seager(tree, tStrat)
                         game["t"] = [str(startNode)]
                         
                     else:
-                        pPlayer = Probe(sys.argv[1])
-                        
-                        if  tStrat == "Random": tPlayer = Target(None, tRandom)
-                        elif tStrat == "Prob":  tPlayer = Target(None, tProbabilistic)
-                        elif tStrat == "UpDown":tPlayer = Target(None, tUpDown)
-                        
+                        pPlayer = Probe(pStrats[sys.argv[1]])
+                        tPlayer = Target(None, tStrat)
                         tPlayer.moveList.append(str(startNode))
-                        
                         game = Localisation(tree, tPlayer, pPlayer, tInitial = str(startNode))
 
 
