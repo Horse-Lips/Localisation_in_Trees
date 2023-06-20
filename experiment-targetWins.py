@@ -11,6 +11,8 @@ resFile = open("tWinsResults.txt", 'w') #Results outfile
 for pStrat in pStrats:      #Iterate probe  strats
     tWins      = []
     percentage = []
+    mini = []
+    maxi = []
     
     for tStrat in tStrats:  #Iterate target strats
         wins  = 0

@@ -1,9 +1,24 @@
-import networkx as nx
-from   natsort  import natsorted
-from   random   import choice
-from   numpy    import cumsum
+import networkx     as nx
+from   natsort      import natsorted
+from   random       import choice
+from   numpy        import cumsum
 from   numpy.random import uniform
 import time, os
+
+
+#============================== Global Variables ==============================#
+global U            #Upper level nodes used by simplified Seager strategy      #
+global L            #Lower level nodes used by simplified Seager strategy      #
+global tSet         #Target set used by Seager's strategy                      #
+global noChild      #Used by Seager to determine if a node has no child        #
+global seagerStep   #Used by Seager to determine stage of the strategy         #
+                                                                               #
+U           = []                                                               #
+L           = []                                                               #
+tSet        = [[], [], []]                                                     #
+noChild     = False                                                            #
+seagerStep  = "Lemma4Step1"                                                    #
+#==============================================================================#
 
 
 class NodeInfo:
@@ -58,33 +73,27 @@ class Localisation:
                     self.tDict["leaves"].append(i)
 
 
-    def setTree(self, tree):
-        self.tree = tree
-        
-        Utils.createTDict("0", self.tDict, self.lDict, self.tree)   #Create tDict rooted at node 0
-        self.tDict["leaves"] = []
-        
-        for i in self.tDict:
-            if i == "leaves":
-                continue
-
-            if self.tDict[i].children == []:
-                self.tDict["leaves"].append(i)
-                    
-
     def play(self):
         """
          - Calls the target's initial() function for initial placement, then alternates
          - the play() function for probe and target until there is a winner.
         """
+        global tSet
+        
         if self.tMoveList == []: tMove = choice(list(self.tree.nodes))      #Initial target placement
         else:                    tMove = self.tMoveList[0]
+        
         pMove = "0"              #Initial probe move (Usually root)
+        
+        pDist = nx.shortest_path_length(self.tree, pMove, tMove)
+        tSet[1] = self.lDict[pDist]
         
         while True:
             dists     = nx.single_source_dijkstra_path_length(self.tree, pMove) #Dist from p to all nodes
-            tDist     = nx.shortest_path_length(self.tree, pMove, tMove)        #Dist from p to t
-            tPossible = [i for i in dists if dists[i] == tDist]                 #Possible t locations
+            pDist     = nx.shortest_path_length(self.tree, pMove, tMove)        #Dist from p to t
+            
+            tSetCombined = tSet[0] + tSet[1] + tSet[2]
+            tPossible    = [i for i in dists if dists[i] == pDist and i in tSetCombined]                 #Possible t locations
             
             self.pMoveList.append(pMove)
             
@@ -101,7 +110,7 @@ class Localisation:
                 break
             
             tMove = self.tMoveFunc(self.tree, self.tDict, self.lDict, tMove)
-            pMove = self.pMoveFunc(self.tree, self.tDict, self.lDict, self.pMoveList, tDist)
+            pMove = self.pMoveFunc(self.tree, self.tDict, self.lDict, self.pMoveList, pDist)
             self.captTime += 1
         
         return self.captTime
@@ -153,11 +162,6 @@ class Seager:
     def __getitem__(self, key):
         try:    return self.iDict[key]
         except: return None
-    
-    
-    def setTree(self, tree):
-        self.tree = tree
-        Utils.createTDict("0", self.tDict, self.lDict, self.tree)
 
 
     def play(self):
@@ -810,13 +814,6 @@ class Seager:
         return levelK[wIndex], levelK[zIndex]
 
 
-    def reset(self):
-        self.captTime = 0
-        self.win = "Target"
-        self.iDict     = dict()
-        self.tMoveList = [self.tMoveList[0]]
-
-
 class Utils:
     """Utility functions for use with various classes."""
     def createTDict(node, tDict, lDict, tree, parent = None, level = 0):
@@ -874,6 +871,23 @@ class Utils:
         if not Utils._detectHideouts(tDict): print("Hideout detected")
         else:                                nx.write_adjlist(tree, "randomTree" + str(numNodes) + ".txt")
 
+
+    def _parents(nodes, tDict):
+        parents = []
+        for node in nodes:
+            parent = tDict[node].parent
+            if parent not in parents:
+                parents.append(parent)
+                
+        return parents
+    
+    
+    def _children(nodes, tDict):
+        children = []
+        for node in nodes: children = children + tDict[node].children
+            
+        return children
+        
 
 class TargetMovement:
     def tRandom(tree, tDict, lDict, node):
@@ -942,15 +956,7 @@ class TargetMovement:
         for i in range(len(neighbours)):
             if n <= nDegrees[i]:
                 return neighbours[i]
-                
 
-#===Global Variables===#
-global U
-global L
-
-U = []
-L = []
-#======================#
 
 class ProbeMovement:
     def pRandom(tree, tDict, lDict, probeList, d):
